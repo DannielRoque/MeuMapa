@@ -39,8 +39,9 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/app_name">
-
         </activity>
+
+        <service android:name=".FetchAddressService"/>
     </application>
 
 </manifest>
