@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
 import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -35,7 +38,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        setSupportActionBar(toolbar_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -46,6 +48,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     }
+
+
+
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -94,8 +100,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
                     val origem = LatLng(it.latitude, it.longitude)
-                    mMap.addMarker(MarkerOptions().position(origem).title("Estou aqui"))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 15.0f))
+//                    mMap.addMarker(MarkerOptions().position(origem).title("Estou aqui"))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 14.0f))
                 }
             }
             .addOnFailureListener {
