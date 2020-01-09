@@ -18,15 +18,15 @@ class FetchAddressService : IntentService("fetchAddressService") {
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun onHandleIntent(intent: Intent?) {
-        intent?.let {
+        if (intent == null) return
 
-            val geocoder : Geocoder = Geocoder(this, Locale.getDefault())
+            val geocoder = Geocoder(this, Locale.getDefault())
             val location: Location = intent.getParcelableExtra(LOCATION_DATA_EXTRA)
             receiver = intent.getParcelableExtra(RECEIVER)
 
-            val addresses : MutableList<Address> = arrayListOf()
+            var  addresses : List<Address> = arrayListOf()
             try {
-            geocoder.getFromLocation(location.latitude, location.longitude, 1)
+            addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
             }catch (e : IOException){
                 Log.e("Teste", "Serviço indisponível $e")
             }catch (i : IllegalArgumentException){
@@ -44,7 +44,7 @@ class FetchAddressService : IntentService("fetchAddressService") {
                 }
                 deliveryResultToReceiver(SUCESS_RESULT, TextUtils.join("|", addressF))
             }
-        }
+
     }
 
     private fun deliveryResultToReceiver(resultCode : Int, message : String){

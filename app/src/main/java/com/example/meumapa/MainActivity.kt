@@ -1,9 +1,11 @@
 package com.example.meumapa
 
 import android.Manifest
-import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
@@ -15,17 +17,44 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_maps.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     lateinit var client: FusedLocationProviderClient
+    lateinit var resultReceiver: AddressResultReceiver
+    private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_maps)
+        setSupportActionBar(toolbar_maps)
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         client = LocationServices.getFusedLocationProviderClient(this)
+        resultReceiver = AddressResultReceiver(null)
 
+
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        mMap.setMinZoomPreference(6.0f)
+        mMap.setMaxZoomPreference(20.0f)
+        // Add a marker in Sydney and move the camera
+
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
 
     }
 
@@ -55,13 +84,18 @@ class MainActivity : AppCompatActivity() {
             requestPermissions(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ), LocationPermissionRequestCode
+                ), LOCALE_PERMISSION_REQUEST_CODE
             )
         }
         client.lastLocation
             .addOnSuccessListener { sucess ->
                 sucess?.let {
                     Log.e("Teste", "${it.latitude},     ${it.longitude}")
+
+
+                    val origem = LatLng(it.latitude, it.longitude)
+                    mMap.addMarker(MarkerOptions().position(origem).title("Estou aqui"))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 15.0f))
                 }
             }
             .addOnFailureListener {
@@ -79,24 +113,30 @@ class MainActivity : AppCompatActivity() {
         val settingsClient: SettingsClient = LocationServices.getSettingsClient(this)
         settingsClient.checkLocationSettings(builder.build())
             .addOnSuccessListener {
-            Log.e("Teste", it.locationSettingsStates.isNetworkLocationPresent.toString())
+                Log.e("Teste", it.locationSettingsStates.isNetworkLocationPresent.toString())
             }
-            .addOnFailureListener {e ->
-                if (e is ResolvableApiException){
-                 val resolvable  : ResolvableApiException = e
+            .addOnFailureListener { e ->
+                if (e is ResolvableApiException) {
+                    val resolvable: ResolvableApiException = e
                     resolvable.startResolutionForResult(this, 10)
                 }
             }
 
-        val locationCallBack : LocationCallback = object : LocationCallback(){
+        val locationCallBack: LocationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 super.onLocationResult(locationResult)
-                if (locationResult == null){
+                if (locationResult == null) {
                     Log.e("Teste2", "local is null")
-                }else{
-                    for ( location in locationResult.locations){
-                        Log.e("Teste2", "${location.latitude}")
+                }
+
+                for (location in locationResult!!.locations) {
+                    Log.e("Teste2", "${location.latitude}")
+
+                    if (!Geocoder.isPresent()) {
+                        return
                     }
+
+//                        startIntenteService(location)
                 }
             }
 
@@ -109,15 +149,27 @@ class MainActivity : AppCompatActivity() {
         client.requestLocationUpdates(locationRequest, locationCallBack, null)
     }
 
-    private class AddressResultReceiver(handler: Handler?) : ResultReceiver(handler) {
+    fun startIntenteService(location: Location) {
+        val intent = Intent(this, FetchAddressService::class.java)
+        intent.putExtra(RECEIVER, resultReceiver)
+        intent.putExtra(LOCATION_DATA_EXTRA, location)
+        startService(intent)
+
+    }
+
+    inner class AddressResultReceiver(handler: Handler?) : ResultReceiver(handler) {
 
         override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-            if (resultData == null)return
+            if (resultData == null) return
 
             val addressOutPut = resultData.getString(RESULT_DATA_KEY)
-            if (addressOutPut != null){
+            if (addressOutPut != null) {
 
-
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
+                    Log.e("Teste", "addressOutPut $addressOutPut")
+                    this@MainActivity.textView.text = addressOutPut
+                }
 
             }
             super.onReceiveResult(resultCode, resultData)
