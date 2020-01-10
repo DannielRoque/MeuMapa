@@ -259,7 +259,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
                 runOnUiThread {
                     Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
                     Log.e("Teste", "addressOutPut $addressOutPut")
-                    this@MainActivity.textView.text = addressOutPut
 
                 }
 
@@ -296,7 +295,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
         return true
     }
 
-    fun closeD(){
-    _dialog?.let { _dialog.dismiss() }
-    }
+    private fun closeD(){ _dialog?.let { _dialog.dismiss() } }
 }
