@@ -4,15 +4,16 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -20,14 +21,13 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_maps.*
+import java.io.IOException
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -47,10 +47,78 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         resultReceiver = AddressResultReceiver(null)
 
 
+
+//        search_texto_maps.debounce {
+//            buscaEndereco(it)
+//        }
+    }
+
+
+    fun EditText.debounce(delegate: (text: String) -> Unit) {
+        val timeDebounce: Long = 800
+        val minSize: Long = 3
+        var textTyped = ""
+        val runnable = Runnable {
+            delegate(textTyped)
+        }
+
+        val handler = Handler()
+
+        addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                handler.removeCallbacks(runnable)
+                textTyped = text.toString()
+                if (text != null && text.length >= minSize) {
+                    handler.postDelayed(runnable, timeDebounce)
+                }
+            }
+        })
+    }
+
+    fun EditText.onChangeText(delegate: (text: String) -> Unit) {
+        addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(
+                textTyped: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                delegate(textTyped.toString())
+            }
+        })
     }
 
 
 
+
+    fun buscaEndereco(endereco: String) {
+        var listaEndereco : MutableList<Address> = arrayListOf()
+        val geocoder : Geocoder = Geocoder(this)
+        try {
+        listaEndereco = geocoder.getFromLocationName(endereco, 1)
+
+
+        }catch (e : IOException){
+            Toast.makeText(this, "$e", Toast.LENGTH_LONG).show()
+        }
+
+        if (listaEndereco.isEmpty()) return
+
+        val address : Address = listaEndereco[0]
+        val localizacao : LatLng =  LatLng(address.latitude, address.longitude)
+
+//        mMap.addMarker(MarkerOptions().position(localizacao).title("Marker"))
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
+
+    }
 
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -109,15 +177,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
         val locationRequest: LocationRequest = LocationRequest.create()
-        locationRequest.interval = 15 * 1000
-        locationRequest.fastestInterval = 5 * 1000
+//        locationRequest.interval = 15 * 1000
+//        locationRequest.fastestInterval = 5 * 1000
         locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 
         val builder: LocationSettingsRequest.Builder = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
 
         val settingsClient: SettingsClient = LocationServices.getSettingsClient(this)
-        settingsClient.checkLocationSettings(builder.build())
+        settingsClient.checkLocationSettings(
+            builder.build()
+        )
             .addOnSuccessListener {
                 Log.e("Teste", it.locationSettingsStates.isNetworkLocationPresent.toString())
             }
@@ -175,6 +245,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
                     Log.e("Teste", "addressOutPut $addressOutPut")
                     this@MainActivity.textView.text = addressOutPut
+
                 }
 
             }

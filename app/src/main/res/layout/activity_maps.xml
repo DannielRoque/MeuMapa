@@ -18,25 +18,25 @@
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent" />
 
-    <RelativeLayout
-        android:id="@+id/layout_relative"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="16sp"
-        android:background="@drawable/borda_branca"
-        map:layout_constraintTop_toTopOf="parent"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintEnd_toEndOf="parent">
+<!--    <RelativeLayout-->
+<!--        android:id="@+id/layout_relative"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_margin="16sp"-->
+<!--        android:background="@drawable/borda_branca"-->
+<!--        map:layout_constraintTop_toTopOf="parent"-->
+<!--        map:layout_constraintStart_toStartOf="parent"-->
+<!--        map:layout_constraintEnd_toEndOf="parent">-->
 
-        <EditText
-            android:id="@+id/search_texto_maps"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:drawableStart="@drawable/ic_action_search"
-            android:hint="Endereco, cidade..."
-            android:imeOptions="actionSearch"/>
+<!--        <EditText-->
+<!--            android:id="@+id/search_texto_maps"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:drawableStart="@drawable/ic_action_search"-->
+<!--            android:hint="Endereco, cidade..."-->
+<!--            android:imeOptions="actionSearch"/>-->
 
-    </RelativeLayout>
+<!--    </RelativeLayout>-->
 
 
 
