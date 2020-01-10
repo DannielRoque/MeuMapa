@@ -7,14 +7,18 @@ import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.ConnectionResult
@@ -28,6 +32,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.*
+import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.view.*
 import java.io.IOException
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
@@ -36,6 +42,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
     lateinit var client: FusedLocationProviderClient
     lateinit var resultReceiver: AddressResultReceiver
     private lateinit var mMap: GoogleMap
+
+    lateinit var _dialog : AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,6 +143,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
 
         //add a listener in the click to show message
         mMap.setOnMapLongClickListener(this)
+        mMap.setOnMarkerClickListener(this)
 
     }
 
@@ -270,6 +279,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     override fun onMarkerClick(marker : Marker): Boolean {
 
+        val meuDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_customizado_marker_salvar, null)
+
+        val meuBuilder = AlertDialog.Builder(this)
+            .setView(meuDialogView)
+
+
+        meuDialogView.botao_nao.setOnClickListener {  closeD()  }
+
+        meuDialogView.botao_sim.setOnClickListener {
+            Toast.makeText(this, "Sim  ${marker.position}", Toast.LENGTH_LONG).show()
+        }
+
+
+        _dialog = meuBuilder.show()
         return true
+    }
+
+    fun closeD(){
+    _dialog?.let { _dialog.dismiss() }
     }
 }
