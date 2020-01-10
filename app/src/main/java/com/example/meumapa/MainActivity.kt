@@ -24,12 +24,14 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import java.io.IOException
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
+    GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
 
     lateinit var client: FusedLocationProviderClient
     lateinit var resultReceiver: AddressResultReceiver
@@ -48,9 +50,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-//        search_texto_maps.debounce {
-//            buscaEndereco(it)
-//        }
+        search_texto_maps.debounce {
+            buscaEndereco(it)
+        }
     }
 
 
@@ -117,6 +119,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 //        mMap.addMarker(MarkerOptions().position(localizacao).title("Marker"))
         mMap.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
 
     }
 
@@ -129,6 +132,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
+
+        //add a listener in the click to show message
+        mMap.setOnMapLongClickListener(this)
 
     }
 
@@ -251,5 +257,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             super.onReceiveResult(resultCode, resultData)
         }
+    }
+
+    override fun onMapClick(position: LatLng?) {
+        Toast.makeText(this, "Local: ${position.toString()}", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onMapLongClick(position: LatLng) {
+        mMap.addMarker(MarkerOptions().position(position).title("Olá"))
+        Toast.makeText(this, "Local: $position", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onMarkerClick(marker : Marker): Boolean {
+
+        return true
     }
 }
