@@ -8,7 +8,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_formulario"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/toolbarColor"
         android:theme="@style/Toolbar"
@@ -21,7 +21,7 @@
         android:id="@+id/imagem_local"
         android:layout_width="0dp"
         android:layout_height="250dp"
-        android:layout_margin="8dp"
+        android:layout_margin="16dp"
         android:background="@drawable/photo1"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -29,6 +29,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_formulario"
         app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/activity_formulario_botao_foto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_camera"
+        android:layout_marginEnd="20sp"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:layout_constraintStart_toStartOf="@id/imagem_local"
+        app:layout_constraintBottom_toTopOf="@id/imagem_local"
+        app:layout_constraintEnd_toEndOf="@id/imagem_local"
+        app:layout_constraintTop_toBottomOf="@id/imagem_local"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintVertical_bias="0.1"/>
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/activity_formulario_descricao"
@@ -40,7 +55,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/imagem_local"
         app:layout_constraintStart_toStartOf="@id/imagem_local"
-        app:layout_constraintTop_toBottomOf="@id/imagem_local"
+        app:layout_constraintTop_toBottomOf="@id/activity_formulario_botao_foto"
         app:layout_constraintVertical_bias="0.0">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -85,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/observacao"
-            android:lines="4"
+            android:inputType="textLongMessage"
             android:textSize="18sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
