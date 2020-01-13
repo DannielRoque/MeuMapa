@@ -3,11 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/viewMapa">
+    app:startDestination="@id/mapa">
 
     <fragment
-        android:id="@+id/viewMapa"
-        android:name="androidx.fragment.app.Fragment"
-        android:label="ViewMapa"
-        tools:layout="@layout/activity_maps"/>
+        android:id="@+id/mapa"
+        android:label="Mapa" />
 </navigation>

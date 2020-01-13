@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
@@ -25,25 +25,24 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.android.synthetic.main.activity_main.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_maps.*
-import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.*
 import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.view.*
 import java.io.IOException
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
-    GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback,
+    GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
     lateinit var client: FusedLocationProviderClient
     lateinit var resultReceiver: AddressResultReceiver
     private lateinit var mMap: GoogleMap
-
-    lateinit var _dialog : AlertDialog
+    var polyline: Polyline? = null
+    private var listapolyline : MutableList<LatLng> = arrayListOf()
+    private lateinit var _dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,10 +60,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
         search_texto_maps.debounce {
             buscaEndereco(it)
         }
+
+        activity_maps_rota.setOnClickListener {
+            drawRoute()
+            drawRoute()
+        }
     }
 
 
-    fun EditText.debounce(delegate: (text: String) -> Unit) {
+    private fun EditText.debounce(delegate: (text: String) -> Unit) {
         val timeDebounce: Long = 800
         val minSize: Long = 3
         var textTyped = ""
@@ -107,23 +111,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
     }
 
 
-
-
-    fun buscaEndereco(endereco: String) {
-        var listaEndereco : MutableList<Address> = arrayListOf()
-        val geocoder : Geocoder = Geocoder(this)
+    private fun buscaEndereco(endereco: String) {
+        var listaEndereco: MutableList<Address> = arrayListOf()
+        val geocoder: Geocoder = Geocoder(this)
         try {
-        listaEndereco = geocoder.getFromLocationName(endereco, 1)
+            listaEndereco = geocoder.getFromLocationName(endereco, 1)
 
 
-        }catch (e : IOException){
+        } catch (e: IOException) {
             Toast.makeText(this, "$e", Toast.LENGTH_LONG).show()
         }
 
         if (listaEndereco.isEmpty()) return
 
-        val address : Address = listaEndereco[0]
-        val localizacao : LatLng =  LatLng(address.latitude, address.longitude)
+        val address: Address = listaEndereco[0]
+        val localizacao: LatLng = LatLng(address.latitude, address.longitude)
 
 //        mMap.addMarker(MarkerOptions().position(localizacao).title("Marker"))
         mMap.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
@@ -143,7 +145,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
 
         //add a listener in the click to show message
         mMap.setOnMapLongClickListener(this)
+        mMap.setOnMapClickListener(this)
         mMap.setOnMarkerClickListener(this)
+
+
+
 
     }
 
@@ -267,27 +273,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
     }
 
-    override fun onMapClick(position: LatLng?) {
-        Toast.makeText(this, "Local: ${position.toString()}", Toast.LENGTH_LONG).show()
+    override fun onMapLongClick(position: LatLng) {
+//        mMap.addMarker(MarkerOptions().position(position).title("Olá"))
+//        Toast.makeText(this, "Local: $position", Toast.LENGTH_LONG).show()
+//        listapolyline.add(position)
+//        drawRoute()
     }
 
-    override fun onMapLongClick(position: LatLng) {
+    override fun onMapClick(position: LatLng) {
         mMap.addMarker(MarkerOptions().position(position).title("Olá"))
         Toast.makeText(this, "Local: $position", Toast.LENGTH_LONG).show()
+        listapolyline.add(position)
+        if(listapolyline.size>0){
+            activity_maps_recycler_bin.visibility=View.VISIBLE
+        }
+        if (listapolyline.size>=2){
+            activity_maps_rota.visibility = View.VISIBLE
+        }
     }
 
-    override fun onMarkerClick(marker : Marker): Boolean {
 
-        val meuDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_customizado_marker_salvar, null)
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+
+        val meuDialogView =
+            LayoutInflater.from(this).inflate(R.layout.dialog_customizado_marker_salvar, null)
 
         val meuBuilder = AlertDialog.Builder(this)
             .setView(meuDialogView)
 
+        meuDialogView.dialog_imagem_rota.setOnClickListener {
 
-        meuDialogView.botao_nao.setOnClickListener {  closeD()  }
-
-        meuDialogView.botao_sim.setOnClickListener {
-            Toast.makeText(this, "Sim  ${marker.position}", Toast.LENGTH_LONG).show()
+//            Toast.makeText(this, "Sim  ${marker.position}", Toast.LENGTH_LONG).show()
+            drawRoute()
+            drawRoute()
+            closeD()
         }
 
 
@@ -295,5 +315,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
         return true
     }
 
-    private fun closeD(){ _dialog?.let { _dialog.dismiss() } }
+    private fun closeD() {
+        _dialog?.let { _dialog.dismiss() }
+    }
+
+
+
+    private fun drawRoute(){
+        var poly : PolylineOptions
+        if(polyline == null){
+            poly = PolylineOptions()
+
+            for(tam in 0..listapolyline.size){
+                poly.add(listapolyline[0])
+            }
+
+            poly.color(Color.BLUE)
+            polyline = mMap.addPolyline(poly)
+        }else{
+            polyline!!.points = listapolyline
+        }
+                Log.e("Lista", "PoliLyne ${listapolyline.size}")
+    }
+
 }
