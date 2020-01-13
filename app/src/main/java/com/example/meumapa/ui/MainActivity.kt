@@ -1,6 +1,7 @@
-package com.example.meumapa
+package com.example.meumapa.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,6 +22,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.meumapa.*
+import com.example.meumapa.R
+import com.example.meumapa.ui.constantes.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
@@ -33,37 +37,75 @@ import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.view.*
 import java.io.IOException
+import java.text.DecimalFormat
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback,
-    GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMapClickListener {
 
     lateinit var client: FusedLocationProviderClient
     lateinit var resultReceiver: AddressResultReceiver
     private lateinit var mMap: GoogleMap
-    var polyline: Polyline? = null
-    private var listapolyline : MutableList<LatLng> = arrayListOf()
+    private var polyline: Polyline? = null
+    private var listapolyline: MutableList<LatLng> = arrayListOf()
     private lateinit var _dialog: AlertDialog
+    private var distance = 0.0
+    private lateinit var marker: Marker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        buscaEndereco()
+        imagemViewRotas()
+        lixeiraLimpaMapa()
 
         client = LocationServices.getFusedLocationProviderClient(this)
         resultReceiver = AddressResultReceiver(null)
 
 
+    }
 
+    private fun buscaEndereco() {
         search_texto_maps.debounce {
             buscaEndereco(it)
         }
+    }
 
+    @SuppressLint("SetTextI18n")
+    private fun imagemViewRotas() {
         activity_maps_rota.setOnClickListener {
             drawRoute()
             drawRoute()
+            for (i in 0..listapolyline.size) {
+                if (i < listapolyline.size - 1) {
+                    distance += distance(listapolyline[i], listapolyline[i + 1])
+                }
+            }
+            val comUmaCasa = ".#"
+            val decimalFormat = DecimalFormat(comUmaCasa)
+            val format: String = decimalFormat.format(distance)
+            text_metros.visibility = View.VISIBLE
+            text_metros.text = "$format m"
+        }
+    }
+
+    private fun lixeiraLimpaMapa() {
+        activity_maps_recycler_bin.setOnClickListener {
+            mMap.clear()
+            listapolyline.clear()
+            text_metros.visibility = View.GONE
+            activity_maps_recycler_bin.visibility = View.GONE
+            activity_maps_rota.visibility = View.GONE
+            text_metros.text = 0.0.toString()
+            distance = 0.0
+            polyline = null
+
         }
     }
 
@@ -113,46 +155,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
     private fun buscaEndereco(endereco: String) {
         var listaEndereco: MutableList<Address> = arrayListOf()
-        val geocoder: Geocoder = Geocoder(this)
+        val geocoder = Geocoder(this)
         try {
             listaEndereco = geocoder.getFromLocationName(endereco, 1)
-
 
         } catch (e: IOException) {
             Toast.makeText(this, "$e", Toast.LENGTH_LONG).show()
         }
-
         if (listaEndereco.isEmpty()) return
 
         val address: Address = listaEndereco[0]
-        val localizacao: LatLng = LatLng(address.latitude, address.longitude)
+        val localizacao = LatLng(address.latitude, address.longitude)
 
-//        mMap.addMarker(MarkerOptions().position(localizacao).title("Marker"))
         mMap.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
-
     }
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.setMinZoomPreference(6.0f)
         mMap.setMaxZoomPreference(20.0f)
-        // Add a marker in Sydney and move the camera
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
-        //add a listener in the click to show message
-        mMap.setOnMapLongClickListener(this)
         mMap.setOnMapClickListener(this)
         mMap.setOnMarkerClickListener(this)
-
-
-
-
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -160,15 +189,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
         when (codError) {
             ConnectionResult.SERVICE_MISSING or ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED or ConnectionResult.SERVICE_DISABLED -> {
-                Log.e(
-                    "Teste", "show Dialog"
-                )
                 GoogleApiAvailability.getInstance()
                     .getErrorDialog(this, codError, 0, DialogInterface.OnCancelListener {
                         finish()
                     }).show()
             }
-            ConnectionResult.SUCCESS -> Log.e("Teste", "Service Up- to - date")
         }
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -179,22 +204,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             requestPermissions(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ), LOCALE_PERMISSION_REQUEST_CODE
+                ),
+                LOCALE_PERMISSION_REQUEST_CODE
             )
         }
         client.lastLocation
             .addOnSuccessListener { sucess ->
                 sucess?.let {
-                    Log.e("Teste", "${it.latitude},     ${it.longitude}")
-
 
                     val origem = LatLng(it.latitude, it.longitude)
-//                    mMap.addMarker(MarkerOptions().position(origem).title("Estou aqui"))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 14.0f))
                 }
             }
             .addOnFailureListener {
-
             }
 
         val locationRequest: LocationRequest = LocationRequest.create()
@@ -242,7 +264,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 Log.e("Teste", "LocationAvailability ${locationAvailability?.isLocationAvailable}")
             }
         }
-
         client.requestLocationUpdates(locationRequest, locationCallBack, null)
     }
 
@@ -265,35 +286,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 runOnUiThread {
                     Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
                     Log.e("Teste", "addressOutPut $addressOutPut")
-
                 }
-
             }
             super.onReceiveResult(resultCode, resultData)
         }
     }
 
-    override fun onMapLongClick(position: LatLng) {
-//        mMap.addMarker(MarkerOptions().position(position).title("Olá"))
-//        Toast.makeText(this, "Local: $position", Toast.LENGTH_LONG).show()
-//        listapolyline.add(position)
-//        drawRoute()
-    }
-
     override fun onMapClick(position: LatLng) {
-        mMap.addMarker(MarkerOptions().position(position).title("Olá"))
-        Toast.makeText(this, "Local: $position", Toast.LENGTH_LONG).show()
+        mMap.addMarker(MarkerOptions().position(position))
         listapolyline.add(position)
-        if(listapolyline.size>0){
-            activity_maps_recycler_bin.visibility=View.VISIBLE
+        if (listapolyline.size > 0) {
+            activity_maps_recycler_bin.visibility = View.VISIBLE
         }
-        if (listapolyline.size>=2){
+        if (listapolyline.size >= 2) {
             activity_maps_rota.visibility = View.VISIBLE
         }
     }
 
 
-
+    @SuppressLint("InflateParams")
     override fun onMarkerClick(marker: Marker): Boolean {
 
         val meuDialogView =
@@ -302,40 +313,45 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val meuBuilder = AlertDialog.Builder(this)
             .setView(meuDialogView)
 
-        meuDialogView.dialog_imagem_rota.setOnClickListener {
-
-//            Toast.makeText(this, "Sim  ${marker.position}", Toast.LENGTH_LONG).show()
-            drawRoute()
-            drawRoute()
-            closeD()
+        meuDialogView.dialog_imagem_salvar.setOnClickListener {
+        val intent = Intent(this, FormularioSalvaLocalActivity::class.java)
+            Log.e("onMArkClick", "${marker.position}")
+            intent.putExtra(marker.toString(), PATH_CODE)
+            startActivity(intent)
         }
-
-
         _dialog = meuBuilder.show()
         return true
     }
 
-    private fun closeD() {
-        _dialog?.let { _dialog.dismiss() }
-    }
-
-
-
-    private fun drawRoute(){
-        var poly : PolylineOptions
-        if(polyline == null){
+    private fun drawRoute() {
+        val poly: PolylineOptions
+        if (polyline == null) {
             poly = PolylineOptions()
 
-            for(tam in 0..listapolyline.size){
+            for (tam in 0..listapolyline.size) {
                 poly.add(listapolyline[0])
             }
 
             poly.color(Color.BLUE)
             polyline = mMap.addPolyline(poly)
-        }else{
+        } else {
             polyline!!.points = listapolyline
         }
-                Log.e("Lista", "PoliLyne ${listapolyline.size}")
+    }
+
+    private fun distance(StartP: LatLng, EndP: LatLng): Double {
+        val lat1: Double = StartP.latitude
+        val lat2: Double = EndP.latitude
+        val lon1 = StartP.longitude
+        val lon2 = EndP.longitude
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a =
+            sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(
+                dLon / 2
+            ) * sin(dLon / 2)
+        val c = asin(sqrt(a))
+        return 6366000 * c
     }
 
 }

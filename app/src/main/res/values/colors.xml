@@ -7,4 +7,5 @@
     <color name="corBranca">#FFF</color>
     <color name="corPreta">#000</color>
     <color name="corVermelha">#FF0101</color>
+    <color name="corFundoIcone">#190A0A0A</color>
 </resources>

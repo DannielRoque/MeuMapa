@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".ui.MainActivity"
     tools:layout="@layout/activity_maps">
 
 
@@ -24,8 +24,8 @@
         android:layout_height="36dp"
         android:layout_marginTop="100dp"
         android:layout_marginEnd="26dp"
-        android:layout_marginBottom="300dp"
         android:visibility="gone"
+        android:layout_marginBottom="300dp"
         android:background="@drawable/recycle_bin"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintTop_toTopOf="parent" />
@@ -35,11 +35,23 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="300dp"
         android:visibility="gone"
-        android:background="@drawable/travel"
+        android:layout_marginBottom="300dp"
+        android:background="@drawable/start"
         map:layout_constraintEnd_toEndOf="@id/activity_maps_recycler_bin"
         map:layout_constraintTop_toBottomOf="@id/activity_maps_recycler_bin" />
+
+    <TextView
+        android:id="@+id/text_metros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:visibility="gone"
+        map:layout_constraintTop_toBottomOf="@id/activity_maps_rota"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintHorizontal_bias="0.95"/>
 
 
     <RelativeLayout
