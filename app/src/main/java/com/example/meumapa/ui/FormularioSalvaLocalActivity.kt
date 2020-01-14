@@ -23,7 +23,9 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
 
         option = activity_formulario_spinner
 
-        val options = arrayOf("Teste 1", "Teste 2", "Teste 3")
+        val options = arrayOf("Restaurante & Lanchonete", "Bar & Boteco", "Petiscaria",
+            "Hamburgueria", "Pizzaria", "Supermercado", "Doceria", "Parque & Lazer", "Manicure & Pedicure", "Salão de Beleza",
+            "Barbearia", "Roupas & Sapatos", "Mecânico & Borracharia", "Hotel & Pousada", "Casa", "Outros")
 
         option.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, options)
 

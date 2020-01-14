@@ -13,4 +13,10 @@
         <item name="android:textColor">@color/corBranca</item>
     </style>
 
+    <style name="Spinner" parent="AppTheme">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/corPreta</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

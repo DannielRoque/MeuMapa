@@ -21,6 +21,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.meumapa.FetchAddressService
 import com.example.meumapa.R
@@ -48,39 +49,38 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
 
     lateinit var client: FusedLocationProviderClient
-    lateinit var resultReceiver: AddressResultReceiver
-    private lateinit var mMap: GoogleMap
+    private lateinit var resultReceiver: AddressResultReceiver
+    private var mMap: GoogleMap? = null
     private var polyline: Polyline? = null
     private var listapolyline: MutableList<LatLng> = arrayListOf()
     private lateinit var _dialog: AlertDialog
     private var distance = 0.0
     private lateinit var marker: Marker
-    private lateinit var mapFragment : SupportMapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCALE_PERMISSION_REQUEST_CODE)
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//            != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            requestPermissions(
+//                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+//                LOCALE_PERMISSION_REQUEST_CODE
+//            )
+//
+//        }
+        buscaEndereco()
+        imagemViewRotas()
+        lixeiraLimpaMapa()
 
+        client = LocationServices.getFusedLocationProviderClient(this)
+        resultReceiver = AddressResultReceiver(null)
+    }
 
-            mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-
-            buscaEndereco()
-            imagemViewRotas()
-            lixeiraLimpaMapa()
-
-
-            client = LocationServices.getFusedLocationProviderClient(this)
-            resultReceiver = AddressResultReceiver(null)
-
-
+    private fun requestPermission(permission : String,
+                                  requestCode: Int){
+        ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
     }
 
     override fun onRequestPermissionsResult(
@@ -88,27 +88,48 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == LOCALE_PERMISSION_REQUEST_CODE){
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                mapFragment.getMapAsync(this)
+        when (requestCode) {
+
+            LOCALE_PERMISSION_REQUEST_CODE -> {
+                Log.e("mMap", "RequestCode $requestCode  e $LOCALE_PERMISSION_REQUEST_CODE")
+                if ((grantResults.isEmpty()) or (grantResults[0]
+                != PackageManager.PERMISSION_GRANTED)){
+                    Toast.makeText(this, "teste", Toast.LENGTH_LONG).show()
+                }else{
+                    val mapFragment = supportFragmentManager
+                        .findFragmentById(R.id.map) as SupportMapFragment
+                    mapFragment.getMapAsync(this)
+                }
             }
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
 
-
     override fun onMapReady(googleMap: GoogleMap) {
-
-
         mMap = googleMap
-        mMap.setMinZoomPreference(6.0f)
-        mMap.setMaxZoomPreference(20.0f)
+        Log.e("mMap", "$mMap")
 
-        mMap.setOnMapClickListener(this)
-        mMap.setOnMarkerClickListener(this)
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.isMyLocationEnabled = true
+        if (mMap != null){
+            val permission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+
+            if(permission == PackageManager.PERMISSION_GRANTED){
+                mMap?.isMyLocationEnabled = true
+            }else{
+                requestPermission(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    LOCALE_PERMISSION_REQUEST_CODE)
+            }
+        }
+
+        mMap!!.setMinZoomPreference(6.0f)
+        mMap!!.setMaxZoomPreference(20.0f)
+
+        mMap!!.setOnMapClickListener(this)
+        mMap!!.setOnMarkerClickListener(this)
+
+
+        mMap!!.uiSettings.isMyLocationButtonEnabled = true
 
 
     }
@@ -139,7 +160,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private fun lixeiraLimpaMapa() {
         activity_maps_recycler_bin.setOnClickListener {
-            mMap.clear()
+            mMap!!.clear()
             listapolyline.clear()
             text_metros.visibility = View.GONE
             activity_maps_recycler_bin.visibility = View.GONE
@@ -147,7 +168,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             text_metros.text = 0.0.toString()
             distance = 0.0
             polyline = null
-
         }
     }
 
@@ -209,8 +229,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val address: Address = listaEndereco[0]
         val localizacao = LatLng(address.latitude, address.longitude)
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
+        mMap!!.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
     }
 
     override fun onResume() {
@@ -230,7 +250,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 sucess?.let {
 
                     val origem = LatLng(it.latitude, it.longitude)
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 14.0f))
+                    mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 14.0f))
                 }
             }
             .addOnFailureListener {
@@ -309,8 +329,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     override fun onMapClick(position: LatLng) {
-        mMap.addMarker(MarkerOptions().position(position))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17f))
+        mMap!!.addMarker(MarkerOptions().position(position))
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17f))
         listapolyline.add(position)
         if (listapolyline.size > 0) {
             activity_maps_recycler_bin.visibility = View.VISIBLE
@@ -350,10 +370,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
 
             poly.color(Color.BLUE)
-            polyline = mMap.addPolyline(poly)
+            polyline = mMap!!.addPolyline(poly)
         } else {
             polyline!!.points = listapolyline
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(listapolyline[0]))
+            mMap!!.moveCamera(CameraUpdateFactory.newLatLng(listapolyline[0]))
         }
     }
 
