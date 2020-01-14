@@ -1,10 +1,10 @@
 package com.example.meumapa.model
 
-class Local(
-    val id : Int,
-    val imagem : String,
-    val descricao : String,
-    val telefone : String,
-    val observacao : String,
-    val nota : Int
-)
+ open class Local{
+    var id : Long = 0
+    var imagem : String? = null
+    var descricao : String? = null
+    var telefone : String? = null
+    var observacao : String? = null
+    var nota : Int? = null
+ }

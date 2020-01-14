@@ -272,7 +272,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         intent.putExtra(RECEIVER, resultReceiver)
         intent.putExtra(LOCATION_DATA_EXTRA, location)
         startService(intent)
-
     }
 
     inner class AddressResultReceiver(handler: Handler?) : ResultReceiver(handler) {
