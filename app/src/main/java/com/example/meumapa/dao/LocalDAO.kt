@@ -5,10 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.appcompat.widget.ResourceManagerInternal.get
 import com.example.meumapa.model.Local
-import java.sql.Array
-import java.util.*
 
 class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1) {
 
@@ -48,7 +45,7 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
         val db: SQLiteDatabase = readableDatabase
         val c: Cursor = db.rawQuery(sql, null)
 
-        val locais : MutableList<Local> = arrayListOf()
+        val locais: MutableList<Local> = arrayListOf()
         val local = Local()
 
         if (!c.equals(null)) {
@@ -66,17 +63,17 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
         return locais
     }
 
-    fun deletaLocal(local: Local){
-        val db : SQLiteDatabase = writableDatabase
+    fun deletaLocal(local: Local) {
+        val db: SQLiteDatabase = writableDatabase
         val params: kotlin.Array<String> = arrayOf(local.id.toString())
         db.delete("local", "id = ?", params)
     }
 
-    fun alteraLocal(local: Local){
-    val db : SQLiteDatabase= writableDatabase
-    val values : ContentValues = pegaLocal(local=local)
+    fun alteraLocal(local: Local) {
+        val db: SQLiteDatabase = writableDatabase
+        val values: ContentValues = pegaLocal(local = local)
 
-        val params : kotlin.Array<String> = arrayOf(local.id.toString())
+        val params: kotlin.Array<String> = arrayOf(local.id.toString())
         db.update("local", values, "id=?", params)
     }
 }

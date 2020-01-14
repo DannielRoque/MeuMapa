@@ -3,4 +3,5 @@
     <string name="descricao">Descrição</string>
     <string name="telefone">Telefone</string>
     <string name="observacao">Observacao</string>
+    <string name="endereco_cidade">Endereco, cidade...</string>
 </resources>

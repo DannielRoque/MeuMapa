@@ -22,7 +22,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.meumapa.*
+import com.example.meumapa.FetchAddressService
 import com.example.meumapa.R
 import com.example.meumapa.ui.constantes.*
 import com.google.android.gms.common.ConnectionResult
@@ -68,6 +68,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         client = LocationServices.getFusedLocationProviderClient(this)
         resultReceiver = AddressResultReceiver(null)
 
+
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                LOCALE_PERMISSION_REQUEST_CODE
+            )
+        }
+        mMap = googleMap
+        mMap.setMinZoomPreference(6.0f)
+        mMap.setMaxZoomPreference(20.0f)
+
+        mMap.setOnMapClickListener(this)
+        mMap.setOnMarkerClickListener(this)
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+
+            mMap.isMyLocationEnabled = true
 
     }
 
@@ -171,18 +197,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.setMinZoomPreference(6.0f)
-        mMap.setMaxZoomPreference(20.0f)
-
-        mMap.isMyLocationEnabled = true
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-
-        mMap.setOnMapClickListener(this)
-        mMap.setOnMarkerClickListener(this)
-    }
-
     override fun onResume() {
         super.onResume()
         val codError =
@@ -194,19 +208,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         finish()
                     }).show()
             }
-        }
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                LOCALE_PERMISSION_REQUEST_CODE
-            )
         }
         client.lastLocation
             .addOnSuccessListener { sucess ->
@@ -293,6 +294,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapClick(position: LatLng) {
         mMap.addMarker(MarkerOptions().position(position))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17f))
         listapolyline.add(position)
         if (listapolyline.size > 0) {
             activity_maps_recycler_bin.visibility = View.VISIBLE
@@ -313,7 +315,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             .setView(meuDialogView)
 
         meuDialogView.dialog_imagem_salvar.setOnClickListener {
-        val intent = Intent(this, FormularioSalvaLocalActivity::class.java)
+            val intent = Intent(this, FormularioSalvaLocalActivity::class.java)
             Log.e("onMArkClick", "${marker.position}")
             intent.putExtra(marker.toString(), PATH_CODE)
             startActivity(intent)
@@ -335,6 +337,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             polyline = mMap.addPolyline(poly)
         } else {
             polyline!!.points = listapolyline
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(listapolyline[0]))
         }
     }
 
@@ -352,5 +355,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val c = asin(sqrt(a))
         return 6366000 * c
     }
+
 
 }
