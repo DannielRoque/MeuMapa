@@ -46,6 +46,7 @@ import kotlin.math.sqrt
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
     GoogleMap.OnMapClickListener {
 
+
     lateinit var client: FusedLocationProviderClient
     lateinit var resultReceiver: AddressResultReceiver
     private lateinit var mMap: GoogleMap
@@ -54,37 +55,52 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var _dialog: AlertDialog
     private var distance = 0.0
     private lateinit var marker: Marker
+    private lateinit var mapFragment : SupportMapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-        buscaEndereco()
-        imagemViewRotas()
-        lixeiraLimpaMapa()
 
-        client = LocationServices.getFusedLocationProviderClient(this)
-        resultReceiver = AddressResultReceiver(null)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCALE_PERMISSION_REQUEST_CODE)
+        }
+
+
+            mapFragment = supportFragmentManager
+                .findFragmentById(R.id.map) as SupportMapFragment
+
+            buscaEndereco()
+            imagemViewRotas()
+            lixeiraLimpaMapa()
+
+
+            client = LocationServices.getFusedLocationProviderClient(this)
+            resultReceiver = AddressResultReceiver(null)
 
 
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                LOCALE_PERMISSION_REQUEST_CODE
-            )
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == LOCALE_PERMISSION_REQUEST_CODE){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                mapFragment.getMapAsync(this)
+            }
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+
+
+    override fun onMapReady(googleMap: GoogleMap) {
+
+
         mMap = googleMap
         mMap.setMinZoomPreference(6.0f)
         mMap.setMaxZoomPreference(20.0f)
@@ -92,8 +108,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap.setOnMapClickListener(this)
         mMap.setOnMarkerClickListener(this)
         mMap.uiSettings.isMyLocationButtonEnabled = true
+        mMap.isMyLocationEnabled = true
 
-            mMap.isMyLocationEnabled = true
 
     }
 

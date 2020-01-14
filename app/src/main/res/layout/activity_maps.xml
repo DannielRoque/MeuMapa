@@ -12,7 +12,6 @@
         android:id="@+id/search_texto_maps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
         android:drawableStart="@drawable/ic_action_search"
         android:hint="@string/endereco_cidade"
         android:imeOptions="actionSearch"
