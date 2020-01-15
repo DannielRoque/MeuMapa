@@ -3,10 +3,13 @@ package com.example.meumapa.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
 import com.example.meumapa.R
 import com.example.meumapa.ui.constantes.TITLE_FORMULARIO
 import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
@@ -49,11 +52,20 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
     private fun configuraToolbar() {
         setSupportActionBar(toolbar_formulario)
         supportActionBar?.title = TITLE_FORMULARIO
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return super.onSupportNavigateUp()
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_salvar, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.menu_botao_salvar ->{
+                Toast.makeText(this, "Clique salvar", Toast.LENGTH_LONG).show()
+            }
+        }
+        return true
     }
 }

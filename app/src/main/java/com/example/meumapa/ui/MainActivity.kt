@@ -16,12 +16,14 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.example.meumapa.FetchAddressService
 import com.example.meumapa.R
@@ -35,7 +37,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.view.*
 import java.io.IOException
 import java.text.DecimalFormat
@@ -57,7 +59,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
+        setContentView(R.layout.activity_main)
+
+        configuraToolbar()
     }
 
     override fun onRequestPermissionsResult(
@@ -99,11 +103,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
     }
 
-    private fun buscaEndereco() {
-        search_texto_maps.debounce {
-            buscaEndereco(it)
-        }
-    }
+//    private fun buscaEndereco() {
+//        search_texto_maps.debounce {
+//            buscaEndereco(it)
+//        }
+//    }
 
     @SuppressLint("SetTextI18n")
     private fun imagemViewRotas() {
@@ -214,7 +218,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
 
-            buscaEndereco()
+//            buscaEndereco()
             imagemViewRotas()
             lixeiraLimpaMapa()
 
@@ -377,6 +381,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             ) * sin(dLon / 2)
         val c = asin(sqrt(a))
         return 6366000 * c
+    }
+
+    private fun configuraToolbar() {
+        setSupportActionBar(toolbar_mapa)
+        supportActionBar?.title = TITLE_MAPA
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_informativo, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.menu_botao_informativo -> {
+                Toast.makeText(this, "Click informativo", Toast.LENGTH_LONG).show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 

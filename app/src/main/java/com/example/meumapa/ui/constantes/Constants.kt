@@ -10,3 +10,4 @@ const val LOCATION_DATA_EXTRA = "$PACKAGE_NAME.LOCATION_DATA_EXTRA"
 const val LOCALE_PERMISSION_REQUEST_CODE = 1
 const val PATH_CODE = 2
 const val TITLE_FORMULARIO = "Formulario local"
+const val TITLE_MAPA = "Meu mapa"
