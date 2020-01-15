@@ -8,21 +8,29 @@
     tools:context=".ui.MainActivity"
     tools:layout="@layout/activity_maps">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_mapa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/toolbarColor"
+        map:layout_constraintTop_toTopOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintEnd_toEndOf="parent">
+
     <EditText
         android:id="@+id/search_texto_maps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_action_search"
+        android:drawableStart="@drawable/ic_action_procurar"
         android:hint="@string/endereco_cidade"
         android:imeOptions="actionSearch"
-        android:layout_marginTop="10sp"
-        android:layout_marginEnd="16sp"
-        android:layout_marginStart="16sp"
         android:textSize="26sp"
-        map:layout_constraintTop_toTopOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintBottom_toTopOf="@id/map"
-        map:layout_constraintStart_toStartOf="parent"/>
+        android:textColor="@color/corBranca"
+        android:textColorHint="@color/corHint"
+        android:backgroundTint="@color/corBranca"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
 
     <fragment
         android:id="@+id/map"
@@ -32,7 +40,7 @@
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toBottomOf="@id/search_texto_maps"/>
+        map:layout_constraintTop_toBottomOf="@id/toolbar_mapa"/>
 
     <Button
         android:id="@+id/activity_maps_recycler_bin"
@@ -63,6 +71,8 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="14sp"
+        android:textColor="@color/corPreta"
+        android:textStyle="bold"
         android:visibility="gone"
         map:layout_constraintTop_toBottomOf="@id/activity_maps_rota"
         map:layout_constraintStart_toStartOf="parent"

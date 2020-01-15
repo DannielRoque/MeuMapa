@@ -47,40 +47,17 @@ import kotlin.math.sqrt
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
     GoogleMap.OnMapClickListener {
 
-
-    lateinit var client: FusedLocationProviderClient
+    private  var client: FusedLocationProviderClient? = null
     private lateinit var resultReceiver: AddressResultReceiver
     private var mMap: GoogleMap? = null
     private var polyline: Polyline? = null
     private var listapolyline: MutableList<LatLng> = arrayListOf()
     private lateinit var _dialog: AlertDialog
     private var distance = 0.0
-    private lateinit var marker: Marker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-//            != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            requestPermissions(
-//                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-//                LOCALE_PERMISSION_REQUEST_CODE
-//            )
-//
-//        }
-        buscaEndereco()
-        imagemViewRotas()
-        lixeiraLimpaMapa()
-
-        client = LocationServices.getFusedLocationProviderClient(this)
-        resultReceiver = AddressResultReceiver(null)
-    }
-
-    private fun requestPermission(permission : String,
-                                  requestCode: Int){
-        ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
     }
 
     override fun onRequestPermissionsResult(
@@ -89,49 +66,37 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         grantResults: IntArray
     ) {
         when (requestCode) {
-
             LOCALE_PERMISSION_REQUEST_CODE -> {
                 Log.e("mMap", "RequestCode $requestCode  e $LOCALE_PERMISSION_REQUEST_CODE")
                 if ((grantResults.isEmpty()) or (grantResults[0]
-                != PackageManager.PERMISSION_GRANTED)){
-                    Toast.makeText(this, "teste", Toast.LENGTH_LONG).show()
-                }else{
-                    val mapFragment = supportFragmentManager
-                        .findFragmentById(R.id.map) as SupportMapFragment
-                    mapFragment.getMapAsync(this)
+                            != PackageManager.PERMISSION_GRANTED)
+                ) {
+                    finish()
                 }
             }
         }
     }
 
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         Log.e("mMap", "$mMap")
 
-        if (mMap != null){
-            val permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
+        if (mMap != null) {
+            val permission = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
 
-            if(permission == PackageManager.PERMISSION_GRANTED){
+            if (permission == PackageManager.PERMISSION_GRANTED) {
                 mMap?.isMyLocationEnabled = true
-            }else{
-                requestPermission(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    LOCALE_PERMISSION_REQUEST_CODE)
             }
         }
 
         mMap!!.setMinZoomPreference(6.0f)
         mMap!!.setMaxZoomPreference(20.0f)
-
         mMap!!.setOnMapClickListener(this)
         mMap!!.setOnMarkerClickListener(this)
-
-
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
-
-
     }
 
     private fun buscaEndereco() {
@@ -235,6 +200,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onResume() {
         super.onResume()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCALE_PERMISSION_REQUEST_CODE
+            )
+        } else {
+
+            val mapFragment = supportFragmentManager
+                .findFragmentById(R.id.map) as SupportMapFragment
+            mapFragment.getMapAsync(this)
+
+            buscaEndereco()
+            imagemViewRotas()
+            lixeiraLimpaMapa()
+
+        client = LocationServices.getFusedLocationProviderClient(this)
+        resultReceiver = AddressResultReceiver(null)
+        }
+
         val codError =
             GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
         when (codError) {
@@ -245,15 +232,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     }).show()
             }
         }
-        client.lastLocation
-            .addOnSuccessListener { sucess ->
+        Log.e("Client", "$client")
+        client?.lastLocation
+            ?.addOnSuccessListener { sucess ->
                 sucess?.let {
 
                     val origem = LatLng(it.latitude, it.longitude)
                     mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(origem, 14.0f))
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
             }
 
         val locationRequest: LocationRequest = LocationRequest.create()
@@ -301,7 +289,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 Log.e("Teste", "LocationAvailability ${locationAvailability?.isLocationAvailable}")
             }
         }
-        client.requestLocationUpdates(locationRequest, locationCallBack, null)
+        client?.requestLocationUpdates(locationRequest, locationCallBack, null)
     }
 
     fun startIntenteService(location: Location) {
@@ -321,7 +309,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
                 runOnUiThread {
                     Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
-                    Log.e("Teste", "addressOutPut $addressOutPut")
                 }
             }
             super.onReceiveResult(resultCode, resultData)

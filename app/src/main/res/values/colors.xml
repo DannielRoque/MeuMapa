@@ -5,6 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="toolbarColor">#1E42F1</color>
     <color name="corBranca">#FFF</color>
+    <color name="corHint">#A6FFFFFF</color>
     <color name="corPreta">#000</color>
     <color name="corVermelha">#FF0101</color>
     <color name="corFundoIcone">#190A0A0A</color>
