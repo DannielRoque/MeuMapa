@@ -18,21 +18,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/corBranca">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:gravity="center_vertical"
-            app:queryHint="Cidade, Endereco..."
-            android:backgroundTint="@color/corBranca"
-            style="@style/Toolbar"
-            app:closeIcon="@drawable/ic_action_close"
-            app:searchIcon="@drawable/ic_action_procurar"
-            android:theme="@style/Toolbar"/>
-
     </androidx.appcompat.widget.Toolbar>
+
+    <View
+        android:id="@+id/view_separation"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/corHint"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_mapa"
+        app:layout_constraintBottom_toTopOf="@id/search_mapa"/>
+
+    <EditText
+        android:id="@+id/search_mapa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:hint="Cidade, Endereco..."
+        android:drawableStart="@drawable/ic_action_procurar"
+        android:textSize="24sp"
+        android:padding="10dp"
+        android:textColor="@color/corBranca"
+        android:background="@color/toolbarColor"
+        android:textColorHint="@color/corHint"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_mapa"
+        app:layout_constraintStart_toStartOf="parent"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
     <fragment
@@ -43,7 +55,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_mapa" />
+        app:layout_constraintTop_toBottomOf="@id/search_mapa" />
 
     <Button
         android:id="@+id/activity_maps_recycler_bin"

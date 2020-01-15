@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         setContentView(R.layout.activity_main)
 
         configuraToolbar()
+        buscaEndereco()
     }
 
     override fun onRequestPermissionsResult(
@@ -103,47 +104,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
     }
 
-//    private fun buscaEndereco() {
-//        search_texto_maps.debounce {
-//            buscaEndereco(it)
-//        }
-//    }
-
-    @SuppressLint("SetTextI18n")
-    private fun imagemViewRotas() {
-        activity_maps_rota.setOnClickListener {
-            drawRoute()
-            drawRoute()
-            for (i in 0..listapolyline.size) {
-                if (i < listapolyline.size - 1) {
-                    distance += distance(listapolyline[i], listapolyline[i + 1])
-                }
-            }
-            val comUmaCasa = ".#"
-            val decimalFormat = DecimalFormat(comUmaCasa)
-            val format: String = decimalFormat.format(distance)
-            text_metros.visibility = View.VISIBLE
-            text_metros.text = "$format m"
+    private fun buscaEndereco() {
+        search_mapa.debounce {
+            buscaEndereco(it)
         }
     }
 
-    private fun lixeiraLimpaMapa() {
-        activity_maps_recycler_bin.setOnClickListener {
-            mMap!!.clear()
-            listapolyline.clear()
-            text_metros.visibility = View.GONE
-            activity_maps_recycler_bin.visibility = View.GONE
-            activity_maps_rota.visibility = View.GONE
-            text_metros.text = 0.0.toString()
-            distance = 0.0
-            polyline = null
-        }
-    }
 
 
     private fun EditText.debounce(delegate: (text: String) -> Unit) {
         val timeDebounce: Long = 800
-        val minSize: Long = 3
+        val minSize: Long = 2
         var textTyped = ""
         val runnable = Runnable {
             delegate(textTyped)
@@ -183,6 +154,36 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         })
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun imagemViewRotas() {
+        activity_maps_rota.setOnClickListener {
+            drawRoute()
+            drawRoute()
+            for (i in 0..listapolyline.size) {
+                if (i < listapolyline.size - 1) {
+                    distance += distance(listapolyline[i], listapolyline[i + 1])
+                }
+            }
+            val comUmaCasa = ".#"
+            val decimalFormat = DecimalFormat(comUmaCasa)
+            val format: String = decimalFormat.format(distance)
+            text_metros.visibility = View.VISIBLE
+            text_metros.text = "$format m"
+        }
+    }
+
+    private fun lixeiraLimpaMapa() {
+        activity_maps_recycler_bin.setOnClickListener {
+            mMap!!.clear()
+            listapolyline.clear()
+            text_metros.visibility = View.GONE
+            activity_maps_recycler_bin.visibility = View.GONE
+            activity_maps_rota.visibility = View.GONE
+            text_metros.text = 0.0.toString()
+            distance = 0.0
+            polyline = null
+        }
+    }
 
     private fun buscaEndereco(endereco: String) {
         var listaEndereco: MutableList<Address> = arrayListOf()
