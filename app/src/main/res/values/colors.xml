@@ -9,4 +9,6 @@
     <color name="corPreta">#000</color>
     <color name="corVermelha">#FF0101</color>
     <color name="corFundoIcone">#190A0A0A</color>
+    <color name="corBorda">#5E000000</color>
+    <color name="corBotaoCamera">#6F2CBE</color>
 </resources>

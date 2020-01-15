@@ -11,3 +11,4 @@ const val LOCALE_PERMISSION_REQUEST_CODE = 1
 const val PATH_CODE = 2
 const val TITLE_FORMULARIO = "Formulario local"
 const val TITLE_MAPA = "Meu mapa"
+const val PATH_CODE_CAMERA = 6
