@@ -12,8 +12,6 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -28,6 +26,7 @@ import androidx.core.content.ContextCompat
 import com.example.meumapa.FetchAddressService
 import com.example.meumapa.R
 import com.example.meumapa.ui.constantes.*
+import com.example.meumapa.ui.extension.debounce
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
@@ -49,7 +48,7 @@ import kotlin.math.sqrt
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
     GoogleMap.OnMapClickListener {
 
-    private  var client: FusedLocationProviderClient? = null
+    private var client: FusedLocationProviderClient? = null
     private lateinit var resultReceiver: AddressResultReceiver
     private var mMap: GoogleMap? = null
     private var polyline: Polyline? = null
@@ -62,7 +61,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         setContentView(R.layout.activity_main)
 
         configuraToolbar()
-        buscaEndereco()
+
+
+        search_mapa.debounce {  buscaEnderecoCampo(it)  }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -104,55 +106,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
     }
 
-    private fun buscaEndereco() {
-        search_mapa.debounce {
-            buscaEndereco(it)
-        }
-    }
 
-
-
-    private fun EditText.debounce(delegate: (text: String) -> Unit) {
-        val timeDebounce: Long = 800
-        val minSize: Long = 2
-        var textTyped = ""
-        val runnable = Runnable {
-            delegate(textTyped)
-        }
-
-        val handler = Handler()
-
-        addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                handler.removeCallbacks(runnable)
-                textTyped = text.toString()
-                if (text != null && text.length >= minSize) {
-                    handler.postDelayed(runnable, timeDebounce)
-                }
-            }
-        })
-    }
-
-    fun EditText.onChangeText(delegate: (text: String) -> Unit) {
-        addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(
-                textTyped: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-                delegate(textTyped.toString())
-            }
-        })
-    }
 
     @SuppressLint("SetTextI18n")
     private fun imagemViewRotas() {
@@ -185,7 +139,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    private fun buscaEndereco(endereco: String) {
+    private fun buscaEnderecoCampo(endereco: String) {
         var listaEndereco: MutableList<Address> = arrayListOf()
         val geocoder = Geocoder(this)
         try {
@@ -223,8 +177,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             imagemViewRotas()
             lixeiraLimpaMapa()
 
-        client = LocationServices.getFusedLocationProviderClient(this)
-        resultReceiver = AddressResultReceiver(null)
+            client = LocationServices.getFusedLocationProviderClient(this)
+            resultReceiver = AddressResultReceiver(null)
         }
 
         val codError =
@@ -395,7 +349,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.menu_botao_informativo -> {
                 Toast.makeText(this, "Click informativo", Toast.LENGTH_LONG).show()
             }

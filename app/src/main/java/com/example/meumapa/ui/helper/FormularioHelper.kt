@@ -3,7 +3,6 @@ package com.example.meumapa.ui.helper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
-import android.widget.Spinner
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.FormularioSalvaLocalActivity
 import com.google.android.material.textfield.TextInputLayout
@@ -15,7 +14,6 @@ class FormularioHelper(activity: FormularioSalvaLocalActivity) {
     private val campoDescricao: TextInputLayout = activity.activity_formulario_descricao
     private val campoTelefone: TextInputLayout = activity.activity_formulario_telefone
     private val campoObservacao: TextInputLayout = activity.activity_formulario_observacao
-    private val campo_categoria: Spinner = activity.activity_formulario_spinner
     private val local = Local()
 
     fun pegaLocal(): Local {
@@ -24,6 +22,7 @@ class FormularioHelper(activity: FormularioSalvaLocalActivity) {
         local.telefone = campoTelefone.editText?.text.toString()
         local.observacao = campoObservacao.editText?.text.toString()
         local.descricao = campoDescricao.editText?.text.toString()
+
         return local
     }
 
