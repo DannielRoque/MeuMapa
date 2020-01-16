@@ -107,24 +107,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
 
+// aqui habilitava o click para calcular distancia entre dois pontos
 
-    @SuppressLint("SetTextI18n")
-    private fun imagemViewRotas() {
-        activity_maps_rota.setOnClickListener {
-            drawRoute()
-            drawRoute()
-            for (i in 0..listapolyline.size) {
-                if (i < listapolyline.size - 1) {
-                    distance += distance(listapolyline[i], listapolyline[i + 1])
-                }
-            }
-            val comUmaCasa = ".#"
-            val decimalFormat = DecimalFormat(comUmaCasa)
-            val format: String = decimalFormat.format(distance)
-            text_metros.visibility = View.VISIBLE
-            text_metros.text = "$format m"
-        }
-    }
+//    @SuppressLint("SetTextI18n")
+//    private fun imagemViewRotas() {
+//        activity_maps_rota.setOnClickListener {
+//            drawRoute()
+//            drawRoute()
+//            for (i in 0..listapolyline.size) {
+//                if (i < listapolyline.size - 1) {
+//                    distance += distance(listapolyline[i], listapolyline[i + 1])
+//                }
+//            }
+//            val comUmaCasa = ".#"
+//            val decimalFormat = DecimalFormat(comUmaCasa)
+//            val format: String = decimalFormat.format(distance)
+//            text_metros.visibility = View.VISIBLE
+//            text_metros.text = "$format m"
+//        }
+//    }
 
     private fun lixeiraLimpaMapa() {
         activity_maps_recycler_bin.setOnClickListener {
@@ -174,7 +175,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             mapFragment.getMapAsync(this)
 
 //            buscaEndereco()
-            imagemViewRotas()
+//            imagemViewRotas()   // aqui atualiza o componente visivel
             lixeiraLimpaMapa()
 
             client = LocationServices.getFusedLocationProviderClient(this)
@@ -276,14 +277,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapClick(position: LatLng) {
         mMap!!.addMarker(MarkerOptions().position(position))
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17f))
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
         listapolyline.add(position)
         if (listapolyline.size > 0) {
             activity_maps_recycler_bin.visibility = View.VISIBLE
         }
         if (listapolyline.size >= 2) {
             activity_maps_rota.visibility = View.VISIBLE
+            text_metros.visibility = View.VISIBLE
         }
+        drawRoute()
+        drawRoute()
+        for (i in 0..listapolyline.size) {
+            if (i < listapolyline.size - 1) {
+                distance += distance(listapolyline[i], listapolyline[i + 1])
+            }
+        }
+        val comUmaCasa = ".#"
+        val decimalFormat = DecimalFormat(comUmaCasa)
+        val format: String = decimalFormat.format(distance)
+        text_metros.text = "$format m"
     }
 
 
@@ -319,7 +332,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             polyline = mMap!!.addPolyline(poly)
         } else {
             polyline!!.points = listapolyline
-            mMap!!.moveCamera(CameraUpdateFactory.newLatLng(listapolyline[0]))
+//            mMap!!.moveCamera(CameraUpdateFactory.newLatLng(listapolyline[0]))
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.meumapa.ui
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,6 +13,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.example.meumapa.BuildConfig
@@ -47,17 +49,68 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
             ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options)
 
         selecionaItemSpinner(options)
+
+
         activity_formulario_botao_foto.setOnClickListener {
-            val intentCamera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            caminhoFoto =
-                getExternalFilesDir(null).toString() + "/" + System.currentTimeMillis() + ".jpg"
-            val arquivoFoto = File(caminhoFoto)
-            intentCamera.putExtra(
-                MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
-                    this, BuildConfig.APPLICATION_ID + ".provider", arquivoFoto
-                )
-            )
-            startActivityForResult(intentCamera, PATH_CODE_CAMERA)
+
+
+
+
+                val builderSingle : AlertDialog.Builder  = AlertDialog.Builder(this)
+                builderSingle.setTitle("Select One Option")
+
+                val arrayAdapter : ArrayAdapter<String>  =  ArrayAdapter(
+                    this,
+                    android.R.layout.select_dialog_singlechoice)
+                arrayAdapter.add("Gallery")
+                arrayAdapter.add("Camera")
+
+                builderSingle.setNegativeButton(
+                    "cancel"
+                ) { dialog, which -> dialog?.dismiss() }
+
+            builderSingle.setAdapter(
+                    arrayAdapter,
+                    object : DialogInterface.OnClickListener {
+
+
+
+                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                            when (which) {
+                                0 -> {
+                                val pickPhoto  =  Intent(Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                                startActivityForResult(pickPhoto, 8)
+                                }
+                                1 ->{
+                                 val takePicture =  Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                                startActivityForResult(takePicture, 9)
+                                }
+
+                            }
+                        }
+                    })
+                builderSingle.show()
+
+
+
+
+
+
+
+
+
+
+//            val intentCamera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            caminhoFoto =
+//                getExternalFilesDir(null).toString() + "/" + System.currentTimeMillis() + ".jpg"
+//            val arquivoFoto = File(caminhoFoto)
+//            intentCamera.putExtra(
+//                MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
+//                    this, BuildConfig.APPLICATION_ID + ".provider", arquivoFoto
+//                )
+//            )
+//            startActivityForResult(intentCamera, PATH_CODE_CAMERA)
         }
     }
 
