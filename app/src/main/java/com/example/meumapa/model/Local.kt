@@ -7,4 +7,5 @@ open class Local : Serializable {
     var imagem: String? = null
     var telefone: String? = null
     var observacao: String? = null
+    var latLng : String? = null
 }

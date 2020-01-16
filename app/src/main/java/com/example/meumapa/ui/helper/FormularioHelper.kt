@@ -3,6 +3,7 @@ package com.example.meumapa.ui.helper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
+import android.widget.TextView
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.FormularioSalvaLocalActivity
 import com.google.android.material.textfield.TextInputLayout
@@ -13,13 +14,14 @@ class FormularioHelper(activity: FormularioSalvaLocalActivity) {
     private val campoImagem: ImageView = activity.imagem_local
     private val campoTelefone: TextInputLayout = activity.activity_formulario_telefone
     private val campoObservacao: TextInputLayout = activity.activity_formulario_observacao
+    private val campoLatLong: TextView = activity.txt_latlong
     private val local = Local()
 
     fun pegaLocal(): Local {
         local.imagem = campoImagem.tag as String?
         local.telefone = campoTelefone.editText?.text.toString()
         local.observacao = campoObservacao.editText?.text.toString()
-
+        local.latLng = campoLatLong.text.toString()
         return local
     }
 

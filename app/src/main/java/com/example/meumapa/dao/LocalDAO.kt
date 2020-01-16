@@ -12,7 +12,7 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
 
     override fun onCreate(db: SQLiteDatabase?) {
         val sql =
-            "CREATE TABLE local(id INTEGER PRIMARY KEY, imagem TEXT, descricao TEXT NOT NULL, telefone TEXT, observacao TEXT, nota INTEGER)"
+            "CREATE TABLE local(id INTEGER PRIMARY KEY, imagem TEXT, telefone TEXT, observacao TEXT, latlong TEXT)"
         db?.execSQL(sql)
     }
 
@@ -34,6 +34,7 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
         dados.put("imagem", local.imagem)
         dados.put("telefone", local.telefone)
         dados.put("observacao", local.observacao)
+        dados.put("latlong", local.latLng)
         return dados
     }
 
@@ -52,6 +53,7 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
                 local.imagem = (c.getString(c.getColumnIndex("imagem")))
                 local.telefone = (c.getString(c.getColumnIndex("telefone")))
                 local.observacao = (c.getString(c.getColumnIndex("observacao")))
+                local.latLng = (c.getString(c.getColumnIndex("latlong")))
                 locais.add(local)
             }
         }
