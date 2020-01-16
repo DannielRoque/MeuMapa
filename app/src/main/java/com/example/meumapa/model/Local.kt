@@ -1,6 +1,8 @@
 package com.example.meumapa.model
 
-open class Local {
+import java.io.Serializable
+
+open class Local : Serializable{
     var id: Long = 0
     var imagem: String? = null
     var descricao: String? = null

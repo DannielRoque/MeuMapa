@@ -21,6 +21,7 @@ import com.example.meumapa.R
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.constantes.PATH_CODE_CAMERA
 import com.example.meumapa.ui.constantes.TITLE_FORMULARIO
+import com.example.meumapa.ui.helper.FormularioHelper
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
 import java.io.File
@@ -29,6 +30,7 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
 
     private lateinit var option: Spinner
     lateinit var caminhoFoto: String
+    private lateinit var helper : FormularioHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,7 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
 
 
         option = activity_formulario_spinner
+        helper = FormularioHelper(this)
 
         val options = arrayOf(
             "Restaurante & Lanchonete",
@@ -81,9 +84,7 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == PATH_CODE_CAMERA) {
             if (resultCode == Activity.RESULT_OK) {
-                val bitmap: Bitmap = BitmapFactory.decodeFile(caminhoFoto)
-                val bitmapReduzido = Bitmap.createScaledBitmap(bitmap, 480, 480, true)
-                imagem_local.setImageBitmap(bitmapReduzido)
+                helper.carregaImagem(caminhoFoto)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -113,18 +114,15 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val campo_descricao = activity_formulario_descricao
-        val campo_telefone = activity_formulario_telefone
-        val observacao = activity_formulario_observacao
-
         when (item.itemId) {
             R.id.menu_botao_salvar -> {
-                val local = Local()
-                val des = campo_descricao?.editText.toString()
-                val tel = campo_telefone?.editText.toString()
-                val obs = observacao?.editText.toString()
-                Toast.makeText(this, "$des $tel $obs", Toast.LENGTH_LONG).show()
+                val local : Local  = helper.pegaLocal()
+
+                if(local.descricao!!.isEmpty()){
+                    activity_formulario_descricao.error = "Campo não pode ser vazio"
+                }else{ activity_formulario_descricao.error = null }
+
+                Toast.makeText(this, " $local", Toast.LENGTH_LONG).show()
             }
         }
         return true
