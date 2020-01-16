@@ -11,17 +11,14 @@ import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
 class FormularioHelper(activity: FormularioSalvaLocalActivity) {
 
     private val campoImagem: ImageView = activity.imagem_local
-    private val campoDescricao: TextInputLayout = activity.activity_formulario_descricao
     private val campoTelefone: TextInputLayout = activity.activity_formulario_telefone
     private val campoObservacao: TextInputLayout = activity.activity_formulario_observacao
     private val local = Local()
 
     fun pegaLocal(): Local {
         local.imagem = campoImagem.tag as String?
-        local.descricao = campoDescricao.editText?.text.toString()
         local.telefone = campoTelefone.editText?.text.toString()
         local.observacao = campoObservacao.editText?.text.toString()
-        local.descricao = campoDescricao.editText?.text.toString()
 
         return local
     }

@@ -32,10 +32,8 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
         val dados = ContentValues()
         dados.put("id", local.id)
         dados.put("imagem", local.imagem)
-        dados.put("descricao", local.descricao)
         dados.put("telefone", local.telefone)
         dados.put("observacao", local.observacao)
-        dados.put("nota", local.nota)
         return dados
     }
 
@@ -52,10 +50,8 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
             while (c.moveToNext()) {
                 local.id = (c.getLong(c.getColumnIndex("id")))
                 local.imagem = (c.getString(c.getColumnIndex("imagem")))
-                local.descricao = (c.getString(c.getColumnIndex("descricao")))
                 local.telefone = (c.getString(c.getColumnIndex("telefone")))
                 local.observacao = (c.getString(c.getColumnIndex("observacao")))
-                local.nota = (c.getInt(c.getColumnIndex("nota")))
                 locais.add(local)
             }
         }

@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.FormularioSalvaLocalActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_formulario"
@@ -42,39 +47,15 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintVertical_bias="0.1"/>
 
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/activity_formulario_descricao"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16sp"
-        android:theme="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/imagem_local"
-        app:layout_constraintStart_toStartOf="@id/imagem_local"
-        app:layout_constraintTop_toBottomOf="@id/activity_formulario_botao_foto"
-        app:layout_constraintVertical_bias="0.0">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/descricao"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textSize="18sp" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/activity_formulario_telefone"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="@id/activity_formulario_descricao"
-        app:layout_constraintStart_toStartOf="@id/activity_formulario_descricao"
-        app:layout_constraintTop_toBottomOf="@id/activity_formulario_descricao">
+        android:layout_margin="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_formulario_botao_foto">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -90,8 +71,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="@id/activity_formulario_descricao"
-        app:layout_constraintStart_toStartOf="@id/activity_formulario_descricao"
+        app:layout_constraintEnd_toEndOf="@id/activity_formulario_telefone"
+        app:layout_constraintStart_toStartOf="@id/activity_formulario_telefone"
         app:layout_constraintTop_toBottomOf="@id/activity_formulario_telefone">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -126,6 +107,8 @@
         app:layout_constraintBottom_toBottomOf="@id/activity_formulario_spinner"
         app:layout_constraintEnd_toEndOf="@id/activity_formulario_spinner"/>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

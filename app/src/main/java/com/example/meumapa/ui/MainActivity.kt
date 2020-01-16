@@ -36,6 +36,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.view.*
 import java.io.IOException
@@ -59,9 +60,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         configuraToolbar()
-
 
         search_mapa.debounce {  buscaEnderecoCampo(it)  }
 
@@ -312,7 +311,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         meuDialogView.dialog_imagem_salvar.setOnClickListener {
             val intent = Intent(this, FormularioSalvaLocalActivity::class.java)
             Log.e("onMArkClick", "${marker.position}")
-            intent.putExtra(marker.toString(), PATH_CODE)
+            val objetoJson = Gson()
+            val objetoTransferir = objetoJson.toJson(marker.position)
+            intent.putExtra(PATH_CODE, objetoTransferir)
             startActivity(intent)
         }
         _dialog = meuBuilder.show()
