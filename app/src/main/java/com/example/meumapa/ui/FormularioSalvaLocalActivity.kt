@@ -16,21 +16,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.example.meumapa.BuildConfig
 import com.example.meumapa.R
-import com.example.meumapa.dao.LocalDAO
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.constantes.PATH_CODE
 import com.example.meumapa.ui.constantes.PATH_CODE_CAMERA
 import com.example.meumapa.ui.constantes.TITLE_FORMULARIO
 import com.example.meumapa.ui.helper.FormularioHelper
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
 import java.io.File
 
-class FormularioSalvaLocalActivity : AppCompatActivity(), OnMapReadyCallback {
+class FormularioSalvaLocalActivity : AppCompatActivity() {
 
     private var mMap: GoogleMap? = null
     private lateinit var option: Spinner
@@ -153,10 +151,4 @@ class FormularioSalvaLocalActivity : AppCompatActivity(), OnMapReadyCallback {
             "Outros"
         )
     }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-    }
-
-
 }

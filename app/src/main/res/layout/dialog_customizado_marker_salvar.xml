@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16sp"
     app:cardCornerRadius="1dp"
@@ -10,34 +10,68 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:background="@drawable/custom_borda_cardview"
             android:layout_margin="8dp"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/salvar_text"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Salvar"
+                android:text="@string/texto_click_longo"
                 android:textStyle="bold"
+                android:layout_margin="8dp"
                 android:textColor="@color/corPreta"
-                android:textAlignment="center"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintVertical_bias="0.0"/>
+                android:textAlignment="gravity"
+                app:layout_constraintTop_toTopOf="@id/dialog_imagem_salvar"
+                app:layout_constraintStart_toEndOf="@id/dialog_imagem_salvar"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <ImageView
                 android:id="@+id/dialog_imagem_salvar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="8dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
                 android:src="@drawable/maps_and_location"
-                app:layout_constraintStart_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/salvar_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/view"
+                app:layout_constraintHorizontal_bias="0.0"/>
+
+            <view
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/corFundoIcone"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialog_imagem_salvar"
+                app:layout_constraintBottom_toTopOf="@id/dialog_imagem_deletar"/>
+
+            <TextView
+                android:id="@+id/salvar_deletar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/texto_click_longo"
+                android:textStyle="bold"
+                android:textColor="@color/corPreta"
+                android:textAlignment="gravity"
+                android:layout_marginStart="8dp"
+                app:layout_constraintTop_toTopOf="@id/dialog_imagem_deletar"
+                app:layout_constraintBottom_toBottomOf="@id/dialog_imagem_deletar"
+                app:layout_constraintStart_toStartOf="@id/salvar_text"
+                app:layout_constraintEnd_toEndOf="@id/salvar_text"
+                app:layout_constraintVertical_bias="0.0"/>
+
+            <ImageView
+                android:id="@+id/dialog_imagem_deletar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16sp"
+                android:src="@drawable/maps_and_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
 

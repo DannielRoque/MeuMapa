@@ -4,4 +4,6 @@
     <string name="telefone">Telefone</string>
     <string name="observacao">Observacao</string>
     <string name="endereco_cidade">Endereco, cidade...</string>
+    <string name="texto_click_longo">Para realizar o cadastro de um lugar favorito, basta pressionar e segurar no mapa, assim abrirá o formulário de cadastro</string>
+    <string name="texto_deletar_longo">Quando desejar deletar o local, basta pressionar, assim será deletado automaticamente</string>
 </resources>

@@ -17,11 +17,9 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.example.meumapa.FetchAddressService
 import com.example.meumapa.R
@@ -47,23 +45,46 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
-    GoogleMap.OnMapClickListener {
+    GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
     private var client: FusedLocationProviderClient? = null
     private lateinit var resultReceiver: AddressResultReceiver
-    private var mMap: GoogleMap? = null
+    var mMap: GoogleMap? = null
     private var polyline: Polyline? = null
     private var listapolyline: MutableList<LatLng> = arrayListOf()
     private lateinit var _dialog: AlertDialog
     private var distance = 0.0
+    private val minimSize = 3
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         configuraToolbar()
 
-        search_mapa.debounce {  buscaEnderecoCampo(it)  }
+        search_mapa.debounce { buscaEnderecoCampo(it) }
+    }
 
+
+    fun buscaEnderecoCampo(endereco: String) {
+        if ((!endereco.isEmpty()) and (endereco.length >= minimSize)) {
+            var listaEndereco: MutableList<Address> = arrayListOf()
+            val geocoder = Geocoder(this)
+            try {
+                listaEndereco = geocoder.getFromLocationName(endereco, 1)
+
+            } catch (e: IOException) {
+                Toast.makeText(this, "$e", Toast.LENGTH_LONG).show()
+            }
+
+            if (listaEndereco.isEmpty()) return
+
+            val address: Address = listaEndereco[0]
+            Log.e("buscaEndereco", "$address")
+            val localizacao = LatLng(address.latitude, address.longitude)
+
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
+            mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -101,6 +122,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.setMinZoomPreference(6.0f)
         mMap!!.setMaxZoomPreference(20.0f)
         mMap!!.setOnMapClickListener(this)
+        mMap!!.setOnMapLongClickListener(this)
         mMap!!.setOnMarkerClickListener(this)
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
     }
@@ -139,24 +161,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    private fun buscaEnderecoCampo(endereco: String) {
-        var listaEndereco: MutableList<Address> = arrayListOf()
-        val geocoder = Geocoder(this)
-        try {
-            listaEndereco = geocoder.getFromLocationName(endereco, 1)
-
-        } catch (e: IOException) {
-            Toast.makeText(this, "$e", Toast.LENGTH_LONG).show()
-        }
-        if (listaEndereco.isEmpty()) return
-
-        val address: Address = listaEndereco[0]
-        val localizacao = LatLng(address.latitude, address.longitude)
-
-        mMap!!.animateCamera(CameraUpdateFactory.newLatLng(localizacao))
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15.0f))
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -168,12 +172,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 LOCALE_PERMISSION_REQUEST_CODE
             )
         } else {
-
             val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
 
-//            buscaEndereco()
 //            imagemViewRotas()   // aqui atualiza o componente visivel
             lixeiraLimpaMapa()
 
@@ -238,7 +240,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     if (!Geocoder.isPresent()) {
                         return
                     }
-
 //                        startIntenteService(location)
                 }
             }
@@ -249,29 +250,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
         }
         client?.requestLocationUpdates(locationRequest, locationCallBack, null)
-    }
-
-    fun startIntenteService(location: Location) {
-        val intent = Intent(this, FetchAddressService::class.java)
-        intent.putExtra(RECEIVER, resultReceiver)
-        intent.putExtra(LOCATION_DATA_EXTRA, location)
-        startService(intent)
-    }
-
-    inner class AddressResultReceiver(handler: Handler?) : ResultReceiver(handler) {
-
-        override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-            if (resultData == null) return
-
-            val addressOutPut = resultData.getString(RESULT_DATA_KEY)
-            if (addressOutPut != null) {
-
-                runOnUiThread {
-                    Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
-                }
-            }
-            super.onReceiveResult(resultCode, resultData)
-        }
     }
 
     override fun onMapClick(position: LatLng) {
@@ -298,26 +276,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         text_metros.text = "$format m"
     }
 
+    override fun onMapLongClick(position: LatLng) {
+        val intent = Intent(this, FormularioSalvaLocalActivity::class.java)
+        Log.e("onMArkClick", "$position")
+        val objetoJson = Gson()
+        val objetoTransferir = objetoJson.toJson(position)
+        intent.putExtra(PATH_CODE, objetoTransferir)
+        startActivity(intent)
+    }
 
-    @SuppressLint("InflateParams")
     override fun onMarkerClick(marker: Marker): Boolean {
-
-        val meuDialogView =
-            LayoutInflater.from(this).inflate(R.layout.dialog_customizado_marker_salvar, null)
-
-        val meuBuilder = AlertDialog.Builder(this)
-            .setView(meuDialogView)
-
-        meuDialogView.dialog_imagem_salvar.setOnClickListener {
-            val intent = Intent(this, FormularioSalvaLocalActivity::class.java)
-            Log.e("onMArkClick", "${marker.position}")
-            val objetoJson = Gson()
-            val objetoTransferir = objetoJson.toJson(marker.position)
-            intent.putExtra(PATH_CODE, objetoTransferir)
-            startActivity(intent)
-        }
-        _dialog = meuBuilder.show()
-        return true
+return true
     }
 
     private fun drawRoute() {
@@ -371,5 +340,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         return super.onOptionsItemSelected(item)
     }
 
+    fun startIntenteService(location: Location) {
+        val intent = Intent(this, FetchAddressService::class.java)
+        intent.putExtra(RECEIVER, resultReceiver)
+        intent.putExtra(LOCATION_DATA_EXTRA, location)
+        startService(intent)
+    }
+
+    inner class AddressResultReceiver(handler: Handler?) : ResultReceiver(handler) {
+
+        override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+            if (resultData == null) return
+
+            val addressOutPut = resultData.getString(RESULT_DATA_KEY)
+            if (addressOutPut != null) {
+
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, addressOutPut, Toast.LENGTH_LONG).show()
+                }
+            }
+            super.onReceiveResult(resultCode, resultData)
+        }
+    }
 
 }

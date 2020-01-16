@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 
+
 fun EditText.debounce(delegate: (text: String) -> Unit) {
     val timeDebounce: Long = 800
     val minSize: Long = 2

@@ -38,7 +38,6 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
         return dados
     }
 
-
     fun buscaLocal(): MutableList<Local> {
         val sql = "SELECT * FROM local"
         val db: SQLiteDatabase = readableDatabase
