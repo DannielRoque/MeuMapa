@@ -38,11 +38,9 @@
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name">
-
         </activity>
 
         <service android:name=".FetchAddressService" />
-        
         <provider
             android:authorities="${applicationId}.provider"
             android:name="androidx.core.content.FileProvider"

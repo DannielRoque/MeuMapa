@@ -2,8 +2,6 @@ package com.example.meumapa.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -22,7 +20,6 @@ import com.example.meumapa.model.Local
 import com.example.meumapa.ui.constantes.PATH_CODE_CAMERA
 import com.example.meumapa.ui.constantes.TITLE_FORMULARIO
 import com.example.meumapa.ui.helper.FormularioHelper
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
 import java.io.File
 
@@ -30,7 +27,7 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
 
     private lateinit var option: Spinner
     lateinit var caminhoFoto: String
-    private lateinit var helper : FormularioHelper
+    private lateinit var helper: FormularioHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,24 +41,7 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
         option = activity_formulario_spinner
         helper = FormularioHelper(this)
 
-        val options = arrayOf(
-            "Restaurante & Lanchonete",
-            "Bar & Boteco",
-            "Petiscaria",
-            "Hamburgueria",
-            "Pizzaria",
-            "Supermercado",
-            "Doceria",
-            "Parque & Lazer",
-            "Manicure & Pedicure",
-            "Salão de Beleza",
-            "Barbearia",
-            "Roupas & Sapatos",
-            "Mecânico & Borracharia",
-            "Hotel & Pousada",
-            "Casa",
-            "Outros"
-        )
+        val options = valoresSpinner()
 
         option.adapter =
             ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options)
@@ -103,7 +83,7 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                Log.e("Spinner", options[position])
+                Log.e("Spinner", options[id.toInt()])
             }
         }
     }
@@ -116,11 +96,13 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_botao_salvar -> {
-                val local : Local  = helper.pegaLocal()
+                val local: Local = helper.pegaLocal()
 
-                if(local.descricao!!.isEmpty()){
+                if (local.descricao!!.isEmpty()) {
                     activity_formulario_descricao.error = "Campo não pode ser vazio"
-                }else{ activity_formulario_descricao.error = null }
+                } else {
+                    activity_formulario_descricao.error = null
+                }
 
                 Toast.makeText(this, " $local", Toast.LENGTH_LONG).show()
             }
@@ -131,6 +113,27 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return super.onSupportNavigateUp()
+    }
+
+    private fun valoresSpinner(): Array<String> {
+        return arrayOf(
+            "Restaurante & Lanchonete",
+            "Bar & Boteco",
+            "Petiscaria",
+            "Hamburgueria",
+            "Pizzaria",
+            "Supermercado",
+            "Doceria",
+            "Parque & Lazer",
+            "Manicure & Pedicure",
+            "Salão de Beleza",
+            "Barbearia",
+            "Roupas & Sapatos",
+            "Mecânico & Borracharia",
+            "Hotel & Pousada",
+            "Casa",
+            "Outros"
+        )
     }
 
 
