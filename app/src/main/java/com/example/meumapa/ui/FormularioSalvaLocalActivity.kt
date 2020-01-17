@@ -48,8 +48,9 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
             intent.getStringExtra(PATH_CODE)?.let { dados ->
                 val latLng: LatLng =
                     Gson().fromJson(dados, object : TypeToken<LatLng>() {}.type)
-                txt_latlong.text =
-                    ((latLng.latitude.toString()) + "," + (latLng.longitude.toString()))
+                txt_lat.text = latLng.latitude.toString()
+                txt_long.text = latLng.longitude.toString()
+                Log.e("lista intent", "${latLng.latitude} ${latLng.longitude}")
             }
         }
 

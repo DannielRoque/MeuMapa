@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.FormularioSalvaLocalActivity
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
 
@@ -14,14 +15,16 @@ class FormularioHelper(activity: FormularioSalvaLocalActivity) {
     private val campoImagem: ImageView = activity.imagem_local
     private val campoTelefone: TextInputLayout = activity.activity_formulario_telefone
     private val campoObservacao: TextInputLayout = activity.activity_formulario_observacao
-    private val campoLatLong: TextView = activity.txt_latlong
+    private val campoLatitude: TextView = activity.txt_lat
+    private val campoLongitude: TextView = activity.txt_long
     private val local = Local()
 
     fun pegaLocal(): Local {
         local.imagem = campoImagem.tag as String?
         local.telefone = campoTelefone.editText?.text.toString()
         local.observacao = campoObservacao.editText?.text.toString()
-        local.latLng = campoLatLong.text.toString()
+        local.latitude = campoLatitude.text.toString()
+        local.longitude = campoLongitude.text.toString()
         return local
     }
 

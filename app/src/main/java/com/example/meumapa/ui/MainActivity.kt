@@ -15,13 +15,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.meumapa.FetchAddressService
 import com.example.meumapa.R
+import com.example.meumapa.dao.LocalDAO
 import com.example.meumapa.ui.constantes.*
 import com.example.meumapa.ui.extension.debounce
 import com.google.android.gms.common.ConnectionResult
@@ -35,8 +35,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.dialog_informativo.*
 import java.io.IOException
+import java.lang.Double.parseDouble
 import java.text.DecimalFormat
 import kotlin.math.asin
 import kotlin.math.cos
@@ -51,9 +51,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     var mMap: GoogleMap? = null
     private var polyline: Polyline? = null
     private var listapolyline: MutableList<LatLng> = arrayListOf()
-    private lateinit var _dialog: AlertDialog
     private var distance = 0.0
     private val minimSize = 3
+    private val dao = LocalDAO(this)
+    var listaMarker: MutableList<LatLng> = arrayListOf()
+    val padding: Int = 50
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,7 +106,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        Log.e("mMap", "$mMap")
 
         if (mMap != null) {
             val permission = ContextCompat.checkSelfPermission(
@@ -124,27 +125,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.setOnMarkerClickListener(this)
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
     }
-
-
-// aqui habilitava o click para calcular distancia entre dois pontos
-
-//    @SuppressLint("SetTextI18n")
-//    private fun imagemViewRotas() {
-//        activity_maps_rota.setOnClickListener {
-//            drawRoute()
-//            drawRoute()
-//            for (i in 0..listapolyline.size) {
-//                if (i < listapolyline.size - 1) {
-//                    distance += distance(listapolyline[i], listapolyline[i + 1])
-//                }
-//            }
-//            val comUmaCasa = ".#"
-//            val decimalFormat = DecimalFormat(comUmaCasa)
-//            val format: String = decimalFormat.format(distance)
-//            text_metros.visibility = View.VISIBLE
-//            text_metros.text = "$format m"
-//        }
-//    }
 
     private fun lixeiraLimpaMapa() {
         activity_maps_recycler_bin.setOnClickListener {
@@ -248,6 +228,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
         }
         client?.requestLocationUpdates(locationRequest, locationCallBack, null)
+
+        var lat: Double
+        var lon: Double
+        var locationLatLong: LatLng
+        val listaLocal = dao.buscaLocal()
+        if (listaLocal.isNotEmpty()) {
+            for (myLista in listaLocal) {
+
+                if ((myLista.latitude!!.isNotEmpty()) or (myLista.longitude!!.isNotEmpty())) {
+                    lat = parseDouble(myLista.latitude!!)
+                    lon = parseDouble(myLista.longitude!!)
+                    Log.e("listaMarker2", "$lat $lon")
+                    locationLatLong = LatLng(lat, lon)
+                    listaMarker.add(locationLatLong)
+                }
+            }
+
+            val builder = LatLngBounds.builder()
+            for (markers in listaMarker) {
+
+                builder.include(markers)
+            }
+
+            val bounds: LatLngBounds? = builder.build()
+            if (bounds != null) {
+                val camUp = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+            }
+        }
     }
 
     override fun onMapClick(position: LatLng) {
@@ -284,7 +292,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-return true
+        return true
     }
 
     private fun drawRoute() {
@@ -338,18 +346,18 @@ return true
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showDialog(){
-         val dialog = AlertDialog.Builder(this)
-        val meuVIew = layoutInflater.inflate(R.layout.dialog_informativo,null)
+    private fun showDialog() {
+        val dialog = AlertDialog.Builder(this)
+        val meuVIew = layoutInflater.inflate(R.layout.dialog_informativo, null)
 
-        dialog.setPositiveButton("Eu Entendi"){dialog, which->
+        dialog.setPositiveButton("Eu Entendi") { dialog, which ->
             dialog.cancel()
             dialog.dismiss()
         }
-
         dialog.setView(meuVIew)
         dialog.show()
     }
+
 
     fun startIntenteService(location: Location) {
         val intent = Intent(this, FetchAddressService::class.java)
