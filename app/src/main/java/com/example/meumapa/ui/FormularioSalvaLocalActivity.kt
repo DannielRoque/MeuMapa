@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.example.meumapa.BuildConfig
 import com.example.meumapa.R
+import com.example.meumapa.dao.LocalDAO
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.constantes.PATH_CODE
 import com.example.meumapa.ui.constantes.PATH_CODE_CAMERA
@@ -123,9 +124,15 @@ class FormularioSalvaLocalActivity : AppCompatActivity() {
                     activity_formulario_observacao.error = null
                 }
 
-                Toast.makeText(this, " $local", Toast.LENGTH_LONG).show()
+                if((local.telefone!!.isEmpty()) or (local.telefone==null)){
+                    activity_formulario_telefone.error = "Campo não pode ser vazio"
+                }else{
+                    activity_formulario_telefone.error = null
+                }
 
-
+                val dao = LocalDAO(this)
+                dao.insereLocal(local)
+                finish()
             }
         }
         return true

@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         search_mapa.debounce { buscaEnderecoCampo(it) }
     }
 
-    fun buscaEnderecoCampo(endereco: String) {
+    private fun buscaEnderecoCampo(endereco: String) {
         if ((!endereco.isEmpty()) and (endereco.length >= minimSize)) {
             var listaEndereco: MutableList<Address> = arrayListOf()
             val geocoder = Geocoder(this)
@@ -338,7 +338,6 @@ return true
         return super.onOptionsItemSelected(item)
     }
 
-
     private fun showDialog(){
          val dialog = AlertDialog.Builder(this)
         val meuVIew = layoutInflater.inflate(R.layout.dialog_informativo,null)
@@ -374,5 +373,4 @@ return true
             super.onReceiveResult(resultCode, resultData)
         }
     }
-
 }

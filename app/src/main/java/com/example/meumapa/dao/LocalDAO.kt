@@ -7,17 +7,17 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.meumapa.model.Local
 
-class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1) {
+class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meuMapa", null, 1) {
 
 
     override fun onCreate(db: SQLiteDatabase?) {
         val sql =
-            "CREATE TABLE local(id INTEGER PRIMARY KEY, imagem TEXT, telefone TEXT, observacao TEXT, latlong TEXT)"
+            "CREATE TABLE local_table(id INTEGER PRIMARY KEY AUTOINCREMENT, imagem TEXT, telefone TEXT, observacao TEXT, latlong TEXT)"
         db?.execSQL(sql)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        val sql = "DROP TABLE IF EXISTS local"
+        val sql = "DROP TABLE IF EXISTS local_table"
         db?.execSQL(sql)
         onCreate(db)
     }
@@ -39,7 +39,7 @@ class LocalDAO(context: Context?) : SQLiteOpenHelper(context, "meumapa", null, 1
     }
 
     fun buscaLocal(): MutableList<Local> {
-        val sql = "SELECT * FROM local"
+        val sql = "SELECT * FROM local_table"
         val db: SQLiteDatabase = readableDatabase
         val c: Cursor = db.rawQuery(sql, null)
 

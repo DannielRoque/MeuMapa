@@ -30,6 +30,7 @@
                 android:textAlignment="gravity"
                 app:layout_constraintTop_toTopOf="@id/dialog_imagem_salvar"
                 app:layout_constraintStart_toEndOf="@id/dialog_imagem_salvar"
+                app:layout_constraintBottom_toBottomOf="@id/view"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <ImageView
