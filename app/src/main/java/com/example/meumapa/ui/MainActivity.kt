@@ -63,6 +63,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         configuraToolbar()
 
         search_mapa.debounce { buscaEnderecoCampo(it) }
+
+
+        var lat: Double
+        var lon: Double
+        var locationLatLong: LatLng
+        val listaLocal = dao.buscaLocal()
+        if (listaLocal.isNotEmpty()) {
+            for (myLista in listaLocal) {
+
+                if ((myLista.latitude!!.isNotEmpty()) or (myLista.longitude!!.isNotEmpty())) {
+                    lat = parseDouble(myLista.latitude!!)
+                    lon = parseDouble(myLista.longitude!!)
+                    Log.e("listaMarker2", "$lat $lon")
+                    locationLatLong = LatLng(lat, lon)
+                    listaMarker.add(locationLatLong)
+                }
+            }
+
+            val builder = LatLngBounds.builder()
+            for (markers in listaMarker) {
+                builder.include(markers)
+            }
+
+            val bounds: LatLngBounds? = builder.build()
+            if (bounds != null) {
+                mMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+            }
+        }
     }
 
     private fun buscaEnderecoCampo(endereco: String) {
@@ -124,6 +152,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.setOnMapLongClickListener(this)
         mMap!!.setOnMarkerClickListener(this)
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
+
+        for (mi_mark in listaMarker){
+            mMap!!.addMarker(MarkerOptions().position(mi_mark))
+        }
     }
 
     private fun lixeiraLimpaMapa() {
@@ -229,34 +261,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
         client?.requestLocationUpdates(locationRequest, locationCallBack, null)
 
-        var lat: Double
-        var lon: Double
-        var locationLatLong: LatLng
-        val listaLocal = dao.buscaLocal()
-        if (listaLocal.isNotEmpty()) {
-            for (myLista in listaLocal) {
-
-                if ((myLista.latitude!!.isNotEmpty()) or (myLista.longitude!!.isNotEmpty())) {
-                    lat = parseDouble(myLista.latitude!!)
-                    lon = parseDouble(myLista.longitude!!)
-                    Log.e("listaMarker2", "$lat $lon")
-                    locationLatLong = LatLng(lat, lon)
-                    listaMarker.add(locationLatLong)
-                }
-            }
-
-            val builder = LatLngBounds.builder()
-            for (markers in listaMarker) {
-
-                builder.include(markers)
-            }
-
-            val bounds: LatLngBounds? = builder.build()
-            if (bounds != null) {
-                val camUp = CameraUpdateFactory.newLatLngBounds(bounds, padding)
-            }
-        }
     }
+
 
     override fun onMapClick(position: LatLng) {
         mMap!!.addMarker(MarkerOptions().position(position))

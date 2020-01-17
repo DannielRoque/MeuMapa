@@ -6,7 +6,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.meumapa.model.Local
 import com.example.meumapa.ui.FormularioSalvaLocalActivity
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_formulario_salva_local.*
 
