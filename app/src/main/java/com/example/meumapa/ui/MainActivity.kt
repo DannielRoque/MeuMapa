@@ -5,16 +5,22 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.icu.text.CaseMap
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
+import android.provider.ContactsContract
+import android.text.Html
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +49,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
     private var client: FusedLocationProviderClient? = null
@@ -55,7 +61,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private val minimSize = 3
     private val dao = LocalDAO(this)
     var listaMarker: MutableList<LatLng> = arrayListOf()
-    val padding: Int = 50
+    private lateinit var marker : Marker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,16 +85,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     locationLatLong = LatLng(lat, lon)
                     listaMarker.add(locationLatLong)
                 }
-            }
 
-            val builder = LatLngBounds.builder()
-            for (markers in listaMarker) {
-                builder.include(markers)
-            }
+                val builder = LatLngBounds.builder()
+                for (markers in listaMarker) {
+                    builder.include(markers)
+                }
 
-            val bounds: LatLngBounds? = builder.build()
-            if (bounds != null) {
-                mMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+                val bounds: LatLngBounds? = builder.build()
+                if (bounds != null) {
+                    mMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 2))
+                }
             }
         }
     }
@@ -150,13 +156,86 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap!!.setMaxZoomPreference(20.0f)
         mMap!!.setOnMapClickListener(this)
         mMap!!.setOnMapLongClickListener(this)
-        mMap!!.setOnMarkerClickListener(this)
         mMap!!.uiSettings.isMyLocationButtonEnabled = true
 
-        for (mi_mark in listaMarker){
-            mMap!!.addMarker(MarkerOptions().position(mi_mark))
+        for (mi_mark in listaMarker) {
+            val options = MarkerOptions()
+            options.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+            mMap!!.addMarker(options.position(mi_mark))
         }
+
+//        customAddMarker(LatLng(-22.20525287785512, -49.661143496632576), "Marcador 1 alterado", "O Marcador 1 foi reposicionado" )
+//        customAddMarker(LatLng(-22.221672952934018, -49.66127760708332), "Marcador 2 alterado", "O Marcador 2 foi reposicionado" )
+//
+        mMap!!.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter{
+
+            override fun getInfoContents(marker: Marker): View {
+             val tv : TextView  = TextView(this@MainActivity)
+                tv.text = Html.fromHtml("<b><font color =\"#ff0000\"> ${marker.title} : </font></b>  ${marker.snippet}")
+
+                return tv
+
+            }
+
+            override fun getInfoWindow(marker: Marker): View? {
+                val ll = LinearLayout(this@MainActivity)
+                ll.setPadding(20,20,20,20)
+                ll.setBackgroundColor(Color.YELLOW)
+
+
+                val tv : TextView  = TextView(this@MainActivity)
+                tv.text = Html.fromHtml("<b><font color =\"#fff\"> ${marker.title} : </font></b>  ${marker.snippet}")
+                ll.addView(tv)
+
+                val btn = Button(this@MainActivity)
+                btn.text = "Botao"
+                btn.setBackgroundColor(Color.LTGRAY)
+                btn.setOnClickListener {
+                    Toast.makeText(this@MainActivity, "Botao", Toast.LENGTH_LONG).show()
+                }
+                ll.addView(btn)
+
+                return ll
+            }
+
+        })
+
+//        mMap!!.setOnCameraIdleListener {
+//            Log.e("marker", "setCameraMove")
+//            val lat = mMap!!.cameraPosition.target.latitude
+//            val lng = mMap!!.cameraPosition.target.longitude
+//            customAddMarker(LatLng(lat, lng), "Marcador 1 alterado", "O Marcador 1 foi reposicionado" )
+//        }
+//
+//        mMap!!.setOnMapClickListener {
+//            Log.e("marker", "setOnMapClick")
+//            if (marker != null){
+//                marker.remove()
+//            }
+//            customAddMarker(LatLng(it.latitude, it.longitude), "Marcador 2 alterado", "O Marcador 2 foi reposicionado" )
+//        }
+//
+        mMap!!.setOnMarkerClickListener { marker ->
+            Log.e("marker", "3 MarcadorClicado ${marker.title}")
+            false
+        }
+//
+//        mMap!!.setOnInfoWindowClickListener { marker ->
+//                Log.e("marker", "4 Window ${marker.title}")
+//        }
     }
+
+
+        private fun customAddMarker(latLng: LatLng, title: String, snippet : String){
+        val options = MarkerOptions()
+        options.position(latLng).title(title).snippet(snippet).draggable(true)
+
+            options.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+
+        marker = mMap!!.addMarker(options)
+
+    }
+
 
     private fun lixeiraLimpaMapa() {
         activity_maps_recycler_bin.setOnClickListener {
@@ -265,7 +344,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
 
     override fun onMapClick(position: LatLng) {
-        mMap!!.addMarker(MarkerOptions().position(position))
+        val options = MarkerOptions()
+        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.square))
+        mMap!!.addMarker(options.position(position))
         mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
         listapolyline.add(position)
         if (listapolyline.size > 0) {
@@ -297,9 +378,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         startActivity(intent)
     }
 
-    override fun onMarkerClick(marker: Marker): Boolean {
-        return true
-    }
 
     private fun drawRoute() {
         val poly: PolylineOptions
@@ -310,7 +388,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 poly.add(listapolyline[0])
             }
 
-            poly.color(Color.BLUE)
+            poly.color(Color.GRAY)
             polyline = mMap!!.addPolyline(poly)
         } else {
             polyline!!.points = listapolyline
