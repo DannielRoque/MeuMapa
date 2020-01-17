@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16sp"
-    app:cardCornerRadius="1dp"
+    app:cardCornerRadius="8dp"
     android:elevation="8dp"
     app:cardElevation="8dp"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
@@ -21,7 +22,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/texto_click_longo"
                 android:textStyle="bold"
-                android:layout_margin="8dp"
+                android:textSize="18sp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="10dp"
                 android:textColor="@color/corPreta"
                 android:textAlignment="gravity"
                 app:layout_constraintTop_toTopOf="@id/dialog_imagem_salvar"
@@ -30,16 +34,16 @@
 
             <ImageView
                 android:id="@+id/dialog_imagem_salvar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="90dp"
+                android:layout_height="120dp"
                 android:layout_margin="16dp"
-                android:src="@drawable/maps_and_location"
+                android:src="@drawable/tap"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/view"
                 app:layout_constraintHorizontal_bias="0.0"/>
 
-            <view
+            <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
@@ -53,13 +57,15 @@
                 android:id="@+id/salvar_deletar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/texto_click_longo"
+                android:text="@string/texto_deletar_longo"
                 android:textStyle="bold"
                 android:textColor="@color/corPreta"
                 android:textAlignment="gravity"
                 android:layout_marginStart="8dp"
+                android:textSize="18sp"
+                android:layout_marginBottom="16sp"
                 app:layout_constraintTop_toTopOf="@id/dialog_imagem_deletar"
-                app:layout_constraintBottom_toBottomOf="@id/dialog_imagem_deletar"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@id/salvar_text"
                 app:layout_constraintEnd_toEndOf="@id/salvar_text"
                 app:layout_constraintVertical_bias="0.0"/>
@@ -68,13 +74,13 @@
                 android:id="@+id/dialog_imagem_deletar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:src="@drawable/maps_and_location"
+                android:layout_marginStart="16sp"
+                android:layout_marginBottom="20sp"
+                android:layout_marginTop="18dp"
+                android:src="@drawable/recycle_bin"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
+                app:layout_constraintTop_toBottomOf="@id/view"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</LinearLayout>

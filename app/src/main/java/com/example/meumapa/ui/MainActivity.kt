@@ -1,7 +1,6 @@
 package com.example.meumapa.ui
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,10 +12,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.dialog_customizado_marker_salvar.view.*
+import kotlinx.android.synthetic.main.dialog_informativo.*
 import java.io.IOException
 import java.text.DecimalFormat
 import kotlin.math.asin
@@ -63,7 +62,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         search_mapa.debounce { buscaEnderecoCampo(it) }
     }
-
 
     fun buscaEnderecoCampo(endereco: String) {
         if ((!endereco.isEmpty()) and (endereco.length >= minimSize)) {
@@ -334,10 +332,24 @@ return true
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_botao_informativo -> {
-                Toast.makeText(this, "Click informativo", Toast.LENGTH_LONG).show()
+                showDialog()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+
+    private fun showDialog(){
+         val dialog = AlertDialog.Builder(this)
+        val meuVIew = layoutInflater.inflate(R.layout.dialog_informativo,null)
+
+        dialog.setPositiveButton("Eu Entendi"){dialog, which->
+            dialog.cancel()
+            dialog.dismiss()
+        }
+
+        dialog.setView(meuVIew)
+        dialog.show()
     }
 
     fun startIntenteService(location: Location) {
